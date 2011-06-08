@@ -1,0 +1,42 @@
+Android Billing Library
+By @robot_media
+
+requestPurchase("com.example.item")
+
+That's how simple it should be to use Android In-app Billing.
+
+And with this library it is.
+
+(or will be; this is a very early release)
+
+Android Billing Library implements in-app billing's full specification and stores transactions in an obfuscated local database.
+
+How to use
+==========
+
+Add this library to your project and subclass AbstractBillingActivity in the activity in which you want to use in-app billing. Or use BillingController directly and implement IBillingObserver and BillingController.IConfiguration if you need finer-grain control.
+
+Contact
+=======
+
+Twitter: @robot_media
+Facebook: http://www.facebook.com/robotmedia
+Web: http://www.robotmedia.net
+
+License
+=======
+
+Copyright 2011 Robot Media SL. All rights reserved.
+
+Android Billing Library is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Android Billing Library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser Public License for more details.
+
+You should have received a copy of the GNU Lesser Public License
+along with Android Billing Library.  If not, see <http://www.gnu.org/licenses/>.

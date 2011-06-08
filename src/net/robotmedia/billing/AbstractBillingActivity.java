@@ -23,6 +23,10 @@ import android.app.PendingIntent;
 
 public abstract class AbstractBillingActivity extends Activity implements IBillingObserver, BillingController.IConfiguration {
 
+	public void checkBillingSupporterd() {
+		BillingController.checkBillingSupported(this);
+	};
+	
 	@Override
 	protected void onCreate(android.os.Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -35,11 +39,19 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 		super.onDestroy();
 		BillingController.unregisterObserver(this);
 		BillingController.setConfiguration(null);
-	};
+	}
 	
 	@Override
 	public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {
 		BillingController.startPurchaseIntent(this, purchaseIntent, null);
+	}
+	
+	public void requestPurchase(String itemId) {
+		BillingController.requestPurchase(this, itemId);
+	}
+	
+	public void restoreTransactions() {
+		BillingController.restoreTransactions(this);
 	}
 
 }
