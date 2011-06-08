@@ -4,8 +4,10 @@
       android:versionCode="1"
       android:versionName="1.0">
     <uses-sdk android:minSdkVersion="4" />
+    <!-- Add this permission to your manifest -->
     <uses-permission android:name="com.android.vending.BILLING" />
     <application>
+    	<!-- Add this service and receiver to your application -->
         <service android:name="net.robotmedia.billing.BillingService" />
         <receiver android:name="net.robotmedia.billing.BillingReceiver">
             <intent-filter>

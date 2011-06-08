@@ -20,7 +20,7 @@ How to use
 
 Or use BillingController directly and implement IBillingObserver and BillingController.IConfiguration if you need finer-grain control.
 
-3) Open the AndroidManifest.xml of your application and add this permission…
+3) Open the AndroidManifest.xml of your application and add this permission...
 
 <uses-permission android:name="com.android.vending.BILLING" />
 

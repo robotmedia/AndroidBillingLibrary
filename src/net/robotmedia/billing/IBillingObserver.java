@@ -22,10 +22,40 @@ import android.app.PendingIntent;
 
 public interface IBillingObserver {
 
+	/**
+	 * Called after checking if in-app billing is supported or not.
+	 * @param supported if true, in-app billing is supported. Otherwise, it isn't.
+	 * @see BillingController#checkBillingSupported(android.content.Context)
+	 */
 	public void onBillingChecked(boolean supported);
+	
+	/**
+	 * Called after requesting the purchase of the specified item.
+	 * @param itemId id of the item whose purchase was requested.
+	 * @param purchaseIntent a purchase pending intent for the specified item.
+	 * @see BillingController#requestPurchase(android.content.Context, String, boolean)
+	 */
 	public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent);
+	
+	/**
+	 * Called after the purchase of the specified item was cancelled.
+	 * @param itemId id of the item whose purchase was cancelled.
+	 * @see BillingController#startPurchaseIntent(android.app.Activity, PendingIntent, android.content.Intent)
+	 */
 	public void onPurchaseCancelled(String itemId);
+
+	/**
+	 * Called after the purchase of the specified item was executed.
+	 * @param itemId id of the item whose purchase was executed.
+	 * @see BillingController#startPurchaseIntent(android.app.Activity, PendingIntent, android.content.Intent)
+	 */
 	public void onPurchaseExecuted(String itemId);
+
+	/**
+	 * Called after the purchase of the specified item was refunded.
+	 * @param itemId id of the item whose purchase was refunded.
+	 * @see BillingController#startPurchaseIntent(android.app.Activity, PendingIntent, android.content.Intent)
+	 */
 	public void onPurchaseRefunded(String itemId);
 
 }

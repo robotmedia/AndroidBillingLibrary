@@ -23,6 +23,11 @@ import android.app.PendingIntent;
 
 public abstract class AbstractBillingActivity extends Activity implements IBillingObserver, BillingController.IConfiguration {
 
+	/**
+	 * Requests to check if billing is supported. 
+	 * {@link AbstractBillingActivity#onBillingChecked(boolean)} will be called with the result.
+	 * @see AbstractBillingActivity#onBillingChecked(boolean)
+	 */
 	public void checkBillingSupporterd() {
 		BillingController.checkBillingSupported(this);
 	};
@@ -30,26 +35,40 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 	@Override
 	protected void onCreate(android.os.Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		BillingController.registerObserver(this);
-		BillingController.setConfiguration(this);
+		BillingController.registerObserver(this); // This activity will handle billing notifications
+		BillingController.setConfiguration(this); // This activity will provide the public key and salt
 	};
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		BillingController.unregisterObserver(this);
+		BillingController.unregisterObserver(this); // Avoid receiving notifications after destroy
 		BillingController.setConfiguration(null);
 	}
 	
+	/**
+	 * Called after requesting the purchase of the specified item. The default implementation simply starts the pending intent.
+	 * @param itemId id of the item whose purchase was requested.
+	 * @param purchaseIntent a purchase pending intent for the specified item.
+	 */
 	@Override
 	public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {
 		BillingController.startPurchaseIntent(this, purchaseIntent, null);
 	}
 	
+	/**
+	 * Requests the purchase of the specified item. The transaction will not be
+	 * confirmed automatically; such confirmation could be handled in {@link AbstractBillingActivity#onPurchaseExecuted(String)}. 
+	 * If automatic confirmation is preferred use {@link BillingController#requestPurchase(android.content.Context, String, boolean)} instead.
+	 * @param itemId id of the item to be purchased.
+	 */
 	public void requestPurchase(String itemId) {
 		BillingController.requestPurchase(this, itemId);
 	}
 	
+	/**
+	 * Requests to restore all transactions.
+	 */
 	public void restoreTransactions() {
 		BillingController.restoreTransactions(this);
 	}
