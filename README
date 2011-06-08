@@ -24,7 +24,7 @@ Or use BillingController directly and implement IBillingObserver and BillingCont
 
 <uses-permission android:name="com.android.vending.BILLING" />
 
-Éand this service and receiver inside the application element:
+...and this service and receiver inside the application element:
 
 <service android:name="net.robotmedia.billing.BillingService" />
 <receiver android:name="net.robotmedia.billing.BillingReceiver">
