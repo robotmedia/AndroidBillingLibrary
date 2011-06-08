@@ -14,7 +14,28 @@ Android Billing Library implements in-app billing's full specification and store
 How to use
 ==========
 
-Add this library to your project and subclass AbstractBillingActivity in the activity in which you want to use in-app billing. Or use BillingController directly and implement IBillingObserver and BillingController.IConfiguration if you need finer-grain control.
+1) Add this library to your project.
+
+2) Subclass AbstractBillingActivity in the activity in which you want to use in-app billing. 
+
+Or use BillingController directly and implement IBillingObserver and BillingController.IConfiguration if you need finer-grain control.
+
+3) Open the AndroidManifest.xml of your application and add this permission…
+
+<uses-permission android:name="com.android.vending.BILLING" />
+
+…and this service and receiver inside the application element:
+
+<service android:name="net.robotmedia.billing.BillingService" />
+<receiver android:name="net.robotmedia.billing.BillingReceiver">
+	<intent-filter>
+		<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+		<action android:name="com.android.vending.billing.RESPONSE_CODE" />
+		<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+	</intent-filter>
+</receiver>
+
+That's it!
 
 Contact
 =======
