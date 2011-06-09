@@ -1,0 +1,87 @@
+Android Billing Library
+=======================
+
+	requestPurchase("com.example.item")
+
+That's how simple it should be to use [Android In-app Billing][1].
+
+And with this library it is.
+
+(or will be; this is a very early release)
+
+*Android Billing Library* implements in-app billing's full specification and offers high-level classes to use it. Transactions are stored in obfuscated local database which can be easily queried.
+
+Getting Started
+===============
+
+1. Add this library to your project.
+
+2. Open the AndroidManifest.xml of your application and add this permission...
+
+	<uses-permission android:name="com.android.vending.BILLING" />
+
+...and this service and receiver inside the application element:
+
+	<service android:name="net.robotmedia.billing.BillingService" />
+	<receiver android:name="net.robotmedia.billing.BillingReceiver">
+		<intent-filter>
+			<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+			<action android:name="com.android.vending.billing.RESPONSE_CODE" />
+			<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+		</intent-filter>
+	</receiver>
+
+3. Subclass [AbstractBillingActivity][2] in the activity in which you want to use in-app billing. Or use [BillingController][3] if you need finer-grain control.
+
+That's it!
+
+Usage
+=====
+
+Subclassing AbstractBillingActivity
+-----------------------------------
+
+[AbstractBillingActivity][2] is an abstract activity that provides default integration with in-app billing. It is useful to get acquainted with the library, or for very simple applications. For more flexibility use [BillingController][3] instead.
+
+When started your [AbstractBillingActivity][2] subclass will check if in-app billing is supported, followed by a call to `onBillingChecked(boolean)`, which has to be implemented by the subclass.
+
+Additionally, the first your [AbstractBillingActivity][2] subclass runs it will attempt to restore all transactions. This is necessary in case the user has previously installed the app and made purchases. Existing transactions will generate calls to `onPurchaseExecuted(String)`, `onPurchaseCancelled(String)` and `onPurchaseRefunded(String)` accordingly, all of which have to be implemented by the subclass.
+
+Starting a purchase is as simple as calling `requestPurchase(String)`. [AbstractBillingActivity][2] will start the Android Market intent automatically and `onPurchase{State}(String)` will be called after the transaction is confirmed.
+
+BillingController
+-----------------
+
+[BillingController][3] provides high-level functions to interact with the Billing service and to query an obfuscated local transaction database.
+
+Since most billing functions are asynchronous, [BillingController][3] notifies all registered [IBillingObserver][4] of the responses. Additionally, [BillingController][3] requires a _BillingController.IConfiguration_ instance from which the public key required to validate signed messages and a salt to obfuscate transactions are obtained.
+
+Contact
+=======
+
+Twitter: http://www.twitter.com/robot_media
+Facebook: http://www.facebook.com/robotmedia
+Web: http://www.robotmedia.net
+
+License
+=======
+
+Copyright 2011 Robot Media SL. All rights reserved.
+
+Android Billing Library is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Android Billing Library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser Public License for more details.
+
+You should have received a copy of the GNU Lesser Public License
+along with Android Billing Library.  If not, see <http://www.gnu.org/licenses/>.
+
+[1]: http://developer.android.com/guide/market/billing/index.html
+[2]: https://github.com/robotmedia/AndroidBillingLibrary/blob/master/AndroidBillingLibrary/src/net/robotmedia/billing/AbstractBillingActivity.java
+[3]: https://github.com/robotmedia/AndroidBillingLibrary/blob/master/AndroidBillingLibrary/src/net/robotmedia/billing/BillingController.java
+[4]: https://github.com/robotmedia/AndroidBillingLibrary/blob/master/AndroidBillingLibrary/src/net/robotmedia/billing/IBillingObserver.java
