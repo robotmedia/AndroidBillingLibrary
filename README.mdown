@@ -64,7 +64,7 @@ Disclaimer
 Contact
 =======
 
-http://www.twitter.com/robot_media |Êhttp://www.facebook.com/robotmedia |Êhttp://www.robotmedia.net
+http://www.twitter.com/robot_media /Êhttp://www.facebook.com/robotmedia /Êhttp://www.robotmedia.net
 
 License
 =======
