@@ -16,5 +16,6 @@
                 <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+        <activity android:name="net.robotmedia.billing.MockBillingActivity"></activity>
     </application>
 </manifest>

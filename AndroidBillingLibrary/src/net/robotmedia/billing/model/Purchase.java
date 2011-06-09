@@ -54,7 +54,7 @@ public class Purchase {
         purchase.productId = json.getString(PRODUCT_ID);
         purchase.packageName = json.getString(PACKAGE_NAME);
         purchase.purchaseTime = json.getLong(PURCHASE_TIME);
-        purchase.orderId = json.optString(ORDER_ID, "");
+        purchase.orderId = json.optString(ORDER_ID, null);
         purchase.notificationId = json.optString(NOTIFICATION_ID, null);
         purchase.developerPayload = json.optString(DEVELOPER_PAYLOAD, null);
         return purchase;

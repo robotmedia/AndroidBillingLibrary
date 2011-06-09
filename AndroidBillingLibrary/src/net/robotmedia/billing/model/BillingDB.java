@@ -26,9 +26,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class BillingDB {
-    private static final String DATABASE_NAME = "billing.db";
-    private static final int DATABASE_VERSION = 1;
-    private static final String TABLE_PURCHASES = "purchases";
+    static final String DATABASE_NAME = "billing.db";
+    static final int DATABASE_VERSION = 1;
+    static final String TABLE_PURCHASES = "purchases";
 
     static final String COLUMN__ID = "_id";
     static final String COLUMN_STATE = "state";
@@ -41,7 +41,7 @@ public class BillingDB {
     	COLUMN_PURCHASE_TIME, COLUMN_DEVELOPER_PAYLOAD
     };
 
-    private SQLiteDatabase mDb;
+    SQLiteDatabase mDb;
     private DatabaseHelper mDatabaseHelper;
 
     public BillingDB(Context context) {

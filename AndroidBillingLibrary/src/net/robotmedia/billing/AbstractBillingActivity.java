@@ -28,7 +28,7 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 	 * {@link AbstractBillingActivity#onBillingChecked(boolean)} will be called with the result.
 	 * @see AbstractBillingActivity#onBillingChecked(boolean)
 	 */
-	public void checkBillingSupporterd() {
+	public void checkBillingSupported() {
 		BillingController.checkBillingSupported(this);
 	};
 	

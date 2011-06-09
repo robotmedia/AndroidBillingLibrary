@@ -25,17 +25,17 @@ import android.util.Log;
 
 public class BillingReceiver extends BroadcastReceiver {
 
-    private static final String ACTION_NOTIFY = "com.android.vending.billing.IN_APP_NOTIFY";
-    private static final String ACTION_RESPONSE_CODE =
+    static final String ACTION_NOTIFY = "com.android.vending.billing.IN_APP_NOTIFY";
+    static final String ACTION_RESPONSE_CODE =
         "com.android.vending.billing.RESPONSE_CODE";
-    private static final String ACTION_PURCHASE_STATE_CHANGED =
+    static final String ACTION_PURCHASE_STATE_CHANGED =
         "com.android.vending.billing.PURCHASE_STATE_CHANGED";
 	
-    private static final String EXTRA_NOTIFICATION_ID = "notification_id";
-    private static final String EXTRA_INAPP_SIGNED_DATA = "inapp_signed_data";
-    private static final String EXTRA_INAPP_SIGNATURE = "inapp_signature";
-    private static final String EXTRA_REQUEST_ID = "request_id";
-    private static final String EXTRA_RESPONSE_CODE = "response_code";
+    static final String EXTRA_NOTIFICATION_ID = "notification_id";
+    static final String EXTRA_INAPP_SIGNED_DATA = "inapp_signed_data";
+    static final String EXTRA_INAPP_SIGNATURE = "inapp_signature";
+    static final String EXTRA_REQUEST_ID = "request_id";
+    static final String EXTRA_RESPONSE_CODE = "response_code";
     
 	@Override
     public void onReceive(Context context, Intent intent) {
