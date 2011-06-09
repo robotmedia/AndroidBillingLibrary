@@ -9,16 +9,16 @@ And with this library it is.
 
 (or will be; this is a very early release)
 
-*Android Billing Library* implements in-app billing's full specification and offers high-level classes to use it. Transactions are stored in obfuscated local database which can be easily queried.
+*Android Billing Library* implements in-app billing's full specification and offers high-level classes to use it. Transactions are stored in a local obfuscated database which can be easily queried.
 
 Getting Started
 ===============
 
-1. Add this library to your project.
+* Add this library to your project.
 
-2. Open the AndroidManifest.xml of your application and add this permission...
+* Open the *AndroidManifest.xml* of your application and add this permission...
 
-	<uses-permission android:name="com.android.vending.BILLING" />
+`<uses-permission android:name="com.android.vending.BILLING" />`
 
 ...and this service and receiver inside the application element:
 
@@ -31,9 +31,9 @@ Getting Started
 		</intent-filter>
 	</receiver>
 
-3. Subclass [AbstractBillingActivity][2] in the activity in which you want to use in-app billing. Or use [BillingController][3] if you need finer-grain control.
+* Subclass [AbstractBillingActivity][2] in the activity in which you want to use in-app billing. Or use [BillingController][3] if you need finer-grain control.
 
-That's it!
+**That's it!**
 
 Usage
 =====
@@ -56,12 +56,15 @@ BillingController
 
 Since most billing functions are asynchronous, [BillingController][3] notifies all registered [IBillingObserver][4] of the responses. Additionally, [BillingController][3] requires a _BillingController.IConfiguration_ instance from which the public key required to validate signed messages and a salt to obfuscate transactions are obtained.
 
+Disclaimer
+==========
+
+**This library is a very early release and it should not be used as production code.**
+
 Contact
 =======
 
-Twitter: http://www.twitter.com/robot_media
-Facebook: http://www.facebook.com/robotmedia
-Web: http://www.robotmedia.net
+http://www.twitter.com/robot_media |Êhttp://www.facebook.com/robotmedia |Êhttp://www.robotmedia.net
 
 License
 =======
