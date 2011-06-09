@@ -45,6 +45,14 @@ import android.util.Log;
 
 public class BillingController {
 
+	public static enum BillingStatus {
+		UNKNOWN,
+		SUPPORTED,
+		UNSUPPORTED
+	}
+	
+	private static BillingStatus status = BillingStatus.UNKNOWN;
+	
 	/**
 	 * Used to provide on-demand values to the billing controller.
 	 */
@@ -94,14 +102,18 @@ public class BillingController {
 	}
 
 	/**
-	 * Requests to check if billing is supported. Observers should receive a
+	 * Returns the billing status. If it is currently unknown, requests to check the billing status, in which case observers should eventually receive a
 	 * {@link IBillingObserver#onBillingChecked(boolean)} notification.
 	 * 
 	 * @param context
+	 * @return the current billing status (unknown, supported or unsupported).
 	 * @see IBillingObserver#onBillingChecked(boolean)
 	 */
-	public static void checkBillingSupported(Context context) {
-		BillingService.checkBillingSupported(context);
+	public static BillingStatus checkBillingSupported(Context context) {
+		if (status == BillingStatus.UNKNOWN) {
+			BillingService.checkBillingSupported(context);
+		}
+		return status;
 	}
 
 	/**
@@ -263,6 +275,7 @@ public class BillingController {
 	 * @param supported
 	 */
 	public static void onBillingChecked(boolean supported) {
+		status = supported ? BillingStatus.SUPPORTED : BillingStatus.UNSUPPORTED;
 		for (IBillingObserver o : observers) {
 			o.onBillingChecked(supported);
 		}
