@@ -53,4 +53,11 @@ public class PurchaseTest extends TestCase {
 		assertEquals(PURCHASE_1.purchaseTime, parsed.purchaseTime);
 		assertNull(parsed.developerPayload);
 	}
+	
+	@SmallTest
+	public void testPurchaseStateOrdinal() throws Exception {
+		assertEquals(Purchase.PurchaseState.PURCHASED.ordinal(), 0);
+		assertEquals(Purchase.PurchaseState.CANCELLED.ordinal(), 1);
+		assertEquals(Purchase.PurchaseState.REFUNDED.ordinal(), 2);
+	}
 }
