@@ -24,10 +24,10 @@ import org.json.JSONObject;
 public class Purchase {
 
     public enum PurchaseState {
-        CANCELLED,   // User was charged for the order.
         // Responses to requestPurchase or restoreTransactions.
-        PURCHASED,    // The charge failed on the server.
-        REFUNDED;    // User received a refund for the order.
+    	PURCHASED,    // 0: The charge failed on the server.
+        CANCELLED,   // 1: User was charged for the order.
+    	REFUNDED;    // 2: User received a refund for the order.
 
         // Converts from an ordinal value to the PurchaseState
         public static PurchaseState valueOf(int index) {

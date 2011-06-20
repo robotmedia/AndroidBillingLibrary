@@ -58,6 +58,7 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 													// billing notifications
 		BillingController.setConfiguration(this); // This activity will provide
 													// the public key and salt
+		this.checkBillingSupported();
 		if (!isSubsequentSession()) {
 			BillingController.restoreTransactions(this);
 		}
