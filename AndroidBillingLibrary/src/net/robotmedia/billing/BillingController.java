@@ -49,8 +49,6 @@ public class BillingController {
 		UNKNOWN, SUPPORTED, UNSUPPORTED
 	}
 
-	private static BillingStatus status = BillingStatus.UNKNOWN;
-
 	/**
 	 * Used to provide on-demand values to the billing controller.
 	 */
@@ -71,6 +69,8 @@ public class BillingController {
 		 */
 		public String getPublicKey();
 	}
+
+	private static BillingStatus status = BillingStatus.UNKNOWN;
 
 	private static Set<String> automaticConfirmations = new HashSet<String>();
 	private static IConfiguration configuration = null;
@@ -149,8 +149,9 @@ public class BillingController {
 	}
 
 	/**
-	 * Returns the number of purchases for the specified item. Refunded
-	 * purchases are not subtracted.
+	 * Returns the number of purchases for the specified item. Refunded and
+	 * cancelled purchases are not subtracted. See
+	 * {@link #countPurchasesNet(Context, String)} if they need to be.
 	 * 
 	 * @param context
 	 * @param itemId
@@ -161,6 +162,34 @@ public class BillingController {
 		final byte[] salt = getSalt();
 		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
 		return TransactionManager.countPurchases(context, itemId);
+	}
+
+	/**
+	 * Returns the number of purchases for the specified item, minus the number
+	 * of cancellations and refunds.
+	 * 
+	 * @param context
+	 * @param itemId
+	 *            id of the item whose purchases will be counted.
+	 * @return number of net purchases for the specified item.
+	 */
+	public static int countPurchasesNet(Context context, String itemId) {
+		final List<Transaction> transactions = BillingController.getTransactions(context);
+		int count = 0;
+		for (Transaction t : transactions) {
+			switch (t.purchaseState) {
+			case PURCHASED:
+				count++;
+				break;
+			case CANCELLED:
+				count--;
+				break;
+			case REFUNDED:
+				count--;
+				break;
+			}
+		}
+		return count;
 	}
 
 	/**
@@ -181,23 +210,6 @@ public class BillingController {
 	}
 
 	/**
-	 * Lists all transactions stored locally, including cancellations and refunds.
-	 * 
-	 * @param context
-	 * @return list of transactions.
-	 */
-	public static List<Transaction> getTransactions(Context context) {
-		List<Transaction> transactions = TransactionManager.getTransactions(context);
-		final byte[] salt = getSalt();
-		if (salt != null) {
-			for (Transaction p : transactions) {
-				unobfuscate(context, p);
-			}
-		}
-		return transactions;
-	}
-
-	/**
 	 * Gets the salt from the configuration and logs a warning if it's null.
 	 * 
 	 * @return salt.
@@ -208,6 +220,35 @@ public class BillingController {
 			Log.w(TAG, "Can't (un)obfuscate purchases without salt");
 		}
 		return salt;
+	}
+
+	/**
+	 * Lists all transactions stored locally, including cancellations and
+	 * refunds.
+	 * 
+	 * @param context
+	 * @return list of transactions.
+	 */
+	public static List<Transaction> getTransactions(Context context) {
+		List<Transaction> transactions = TransactionManager.getTransactions(context);
+		unobfuscate(context, transactions);
+		return transactions;
+	}
+
+	/**
+	 * Lists all transactions of the specified item, stored locally.
+	 * 
+	 * @param context
+	 * @param itemId
+	 *            id of the item whose transactions will be returned.
+	 * @return list of transactions.
+	 */
+	public static List<Transaction> getTransactions(Context context, String itemId) {
+		final byte[] salt = getSalt();
+		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
+		List<Transaction> transactions = TransactionManager.getTransactions(context, itemId);
+		unobfuscate(context, transactions);
+		return transactions;
 	}
 
 	/**
@@ -225,6 +266,19 @@ public class BillingController {
 		final byte[] salt = getSalt();
 		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
 		return TransactionManager.isPurchased(context, itemId);
+	}
+
+	/**
+	 * Returns true if there have been purchases for the specified item and the
+	 * number is greater than the number of cancellations and refunds.
+	 * 
+	 * @param context
+	 * @param itemId
+	 *            item id
+	 * @return true if there are net purchases for the item, false otherwise.
+	 */
+	public static boolean isPurchasedNet(Context context, String itemId) {
+		return countPurchasesNet(context, itemId) > 0;
 	}
 
 	/**
@@ -260,7 +314,7 @@ public class BillingController {
 	 *            purchase to be obfuscated.
 	 * @see #unobfuscate(Context, Transaction)
 	 */
-	private static void obfuscate(Context context, Transaction purchase) {
+	static void obfuscate(Context context, Transaction purchase) {
 		final byte[] salt = getSalt();
 		if (salt == null) {
 			return;
@@ -367,14 +421,8 @@ public class BillingController {
 				// refunds.
 				addManualConfirmation(p.productId, p.notificationId);
 			}
-
-			// Save itemId and purchaseState before obfuscation for later use
-			final String itemId = p.productId;
-			final Transaction.PurchaseState purchaseState = p.purchaseState;
-			obfuscate(context, p);
-			TransactionManager.addTransaction(context, p);
-
-			notifyPurchaseStateChange(itemId, purchaseState);
+			storeTransaction(context, p);
+			notifyPurchaseStateChange(p.productId, p.purchaseState);
 		}
 		if (!confirmations.isEmpty()) {
 			final String[] notifyIds = confirmations.toArray(new String[confirmations.size()]);
@@ -542,15 +590,27 @@ public class BillingController {
 		}
 	}
 
+	static void storeTransaction(Context context, Transaction t) {
+		final Transaction t2 = t.clone();
+		obfuscate(context, t2);
+		TransactionManager.addTransaction(context, t2);
+	}
+
+	static void unobfuscate(Context context, List<Transaction> transactions) {
+		for (Transaction p : transactions) {
+			unobfuscate(context, p);
+		}
+	}
+
 	/**
-	 * Unobfuscated the specified purchase.
+	 * Unobfuscate the specified purchase.
 	 * 
 	 * @param context
 	 * @param purchase
 	 *            purchase to unobfuscate.
 	 * @see #obfuscate(Context, Transaction)
 	 */
-	private static void unobfuscate(Context context, Transaction purchase) {
+	static void unobfuscate(Context context, Transaction purchase) {
 		final byte[] salt = getSalt();
 		if (salt == null) {
 			return;

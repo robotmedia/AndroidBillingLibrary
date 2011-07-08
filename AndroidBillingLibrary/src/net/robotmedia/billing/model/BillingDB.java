@@ -68,6 +68,11 @@ public class BillingDB {
                 null, null, null, null);
     }
     
+    public Cursor queryTransactions(String productId) {
+        return mDb.query(TABLE_TRANSACTIONS, TABLE_TRANSACTIONS_COLUMNS, COLUMN_PRODUCT_ID + " = ?", 
+                new String[] {productId}, null, null, null);
+    }
+    
     public Cursor queryTransactions(String productId, PurchaseState state) {
         return mDb.query(TABLE_TRANSACTIONS, TABLE_TRANSACTIONS_COLUMNS, COLUMN_PRODUCT_ID + " = ? AND " + COLUMN_STATE + " = ?", 
                 new String[] {productId, String.valueOf(state.ordinal())}, null, null, null);

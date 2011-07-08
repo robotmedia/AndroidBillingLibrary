@@ -52,6 +52,12 @@ public class TransactionManager {
 	public synchronized static List<Transaction> getTransactions(Context context) {
 		BillingDB db = new BillingDB(context);
 		final Cursor c = db.queryTransactions();
+		final List<Transaction> transactions = cursorToList(c);
+		db.close();
+		return transactions;
+	}
+
+	private static List<Transaction> cursorToList(final Cursor c) {
 		final List<Transaction> transactions = new ArrayList<Transaction>();
         if (c != null) {
         	while (c.moveToNext()) {
@@ -60,6 +66,13 @@ public class TransactionManager {
         	}
         	c.close();
         }
+		return transactions;
+	}
+	
+	public synchronized static List<Transaction> getTransactions(Context context, String itemId) {
+		BillingDB db = new BillingDB(context);
+		final Cursor c = db.queryTransactions(itemId);
+		final List<Transaction> transactions = cursorToList(c);
 		db.close();
 		return transactions;
 	}

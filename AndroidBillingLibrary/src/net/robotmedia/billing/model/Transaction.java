@@ -81,4 +81,51 @@ public class Transaction {
 		this.developerPayload = developerPayload;
 	}
     
+	public Transaction clone() {
+		return new Transaction(orderId, productId, packageName, purchaseState, notificationId, purchaseTime, developerPayload);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Transaction other = (Transaction) obj;
+		if (developerPayload == null) {
+			if (other.developerPayload != null)
+				return false;
+		} else if (!developerPayload.equals(other.developerPayload))
+			return false;
+		if (notificationId == null) {
+			if (other.notificationId != null)
+				return false;
+		} else if (!notificationId.equals(other.notificationId))
+			return false;
+		if (orderId == null) {
+			if (other.orderId != null)
+				return false;
+		} else if (!orderId.equals(other.orderId))
+			return false;
+		if (packageName == null) {
+			if (other.packageName != null)
+				return false;
+		} else if (!packageName.equals(other.packageName))
+			return false;
+		if (productId == null) {
+			if (other.productId != null)
+				return false;
+		} else if (!productId.equals(other.productId))
+			return false;
+		if (purchaseState != other.purchaseState)
+			return false;
+		if (purchaseTime != other.purchaseTime)
+			return false;
+		return true;
+	}
+	
+
+    
 }
