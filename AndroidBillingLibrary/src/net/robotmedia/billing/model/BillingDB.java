@@ -30,11 +30,11 @@ public class BillingDB {
     static final int DATABASE_VERSION = 1;
     static final String TABLE_PURCHASES = "purchases";
 
-    static final String COLUMN__ID = "_id";
-    static final String COLUMN_STATE = "state";
-    static final String COLUMN_PRODUCT_ID = "productId";
-    static final String COLUMN_PURCHASE_TIME = "purchaseTime";
-    static final String COLUMN_DEVELOPER_PAYLOAD = "developerPayload";
+    public static final String COLUMN__ID = "_id";
+    public static final String COLUMN_STATE = "state";
+    public static final String COLUMN_PRODUCT_ID = "productId";
+    public static final String COLUMN_PURCHASE_TIME = "purchaseTime";
+    public static final String COLUMN_DEVELOPER_PAYLOAD = "developerPayload";
 
     private static final String[] TABLE_PURCHASES_COLUMNS = {
     	COLUMN__ID, COLUMN_PRODUCT_ID, COLUMN_STATE,
