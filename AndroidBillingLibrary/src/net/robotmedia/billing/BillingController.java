@@ -28,8 +28,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import net.robotmedia.billing.model.Purchase;
-import net.robotmedia.billing.model.PurchaseManager;
+import net.robotmedia.billing.model.Transaction;
+import net.robotmedia.billing.model.TransactionManager;
 import net.robotmedia.billing.request.BillingRequest;
 import net.robotmedia.billing.request.ResponseCode;
 import net.robotmedia.billing.utils.Compatibility;
@@ -160,7 +160,7 @@ public class BillingController {
 	public static int countPurchases(Context context, String itemId) {
 		final byte[] salt = getSalt();
 		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
-		return PurchaseManager.countPurchases(context, itemId);
+		return TransactionManager.countPurchases(context, itemId);
 	}
 
 	/**
@@ -181,20 +181,20 @@ public class BillingController {
 	}
 
 	/**
-	 * Lists all purchases stored locally, including cancellations and refunds.
+	 * Lists all transactions stored locally, including cancellations and refunds.
 	 * 
 	 * @param context
-	 * @return list of purchases.
+	 * @return list of transactions.
 	 */
-	public static List<Purchase> getPurchases(Context context) {
-		List<Purchase> purchases = PurchaseManager.getPurchases(context);
+	public static List<Transaction> getTransactions(Context context) {
+		List<Transaction> transactions = TransactionManager.getTransactions(context);
 		final byte[] salt = getSalt();
 		if (salt != null) {
-			for (Purchase p : purchases) {
+			for (Transaction p : transactions) {
 				unobfuscate(context, p);
 			}
 		}
-		return purchases;
+		return transactions;
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class BillingController {
 	public static boolean isPurchased(Context context, String itemId) {
 		final byte[] salt = getSalt();
 		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
-		return PurchaseManager.isPurchased(context, itemId);
+		return TransactionManager.isPurchased(context, itemId);
 	}
 
 	/**
@@ -235,7 +235,7 @@ public class BillingController {
 	 * @param state
 	 *            new purchase state of the item.
 	 */
-	private static void notifyPurchaseStateChange(String itemId, Purchase.PurchaseState state) {
+	private static void notifyPurchaseStateChange(String itemId, Transaction.PurchaseState state) {
 		for (IBillingObserver o : observers) {
 			switch (state) {
 			case CANCELLED:
@@ -258,9 +258,9 @@ public class BillingController {
 	 * @param context
 	 * @param purchase
 	 *            purchase to be obfuscated.
-	 * @see #unobfuscate(Context, Purchase)
+	 * @see #unobfuscate(Context, Transaction)
 	 */
-	private static void obfuscate(Context context, Purchase purchase) {
+	private static void obfuscate(Context context, Transaction purchase) {
 		final byte[] salt = getSalt();
 		if (salt == null) {
 			return;
@@ -345,7 +345,7 @@ public class BillingController {
 			}
 		}
 
-		List<Purchase> purchases;
+		List<Transaction> purchases;
 		try {
 			JSONObject jObject = new JSONObject(signedData);
 			if (!verifyNonce(jObject)) {
@@ -359,7 +359,7 @@ public class BillingController {
 		}
 
 		ArrayList<String> confirmations = new ArrayList<String>();
-		for (Purchase p : purchases) {
+		for (Transaction p : purchases) {
 			if (p.notificationId != null && automaticConfirmations.contains(p.productId)) {
 				confirmations.add(p.notificationId);
 			} else {
@@ -370,9 +370,9 @@ public class BillingController {
 
 			// Save itemId and purchaseState before obfuscation for later use
 			final String itemId = p.productId;
-			final Purchase.PurchaseState purchaseState = p.purchaseState;
+			final Transaction.PurchaseState purchaseState = p.purchaseState;
 			obfuscate(context, p);
-			PurchaseManager.addPurchase(context, p);
+			TransactionManager.addTransaction(context, p);
 
 			notifyPurchaseStateChange(itemId, purchaseState);
 		}
@@ -427,8 +427,8 @@ public class BillingController {
 	 * @throws JSONException
 	 *             if the data couldn't be properly parsed.
 	 */
-	private static List<Purchase> parsePurchases(JSONObject data) throws JSONException {
-		ArrayList<Purchase> purchases = new ArrayList<Purchase>();
+	private static List<Transaction> parsePurchases(JSONObject data) throws JSONException {
+		ArrayList<Transaction> purchases = new ArrayList<Transaction>();
 		JSONArray orders = data.optJSONArray(JSON_ORDERS);
 		int numTransactions = 0;
 		if (orders != null) {
@@ -436,7 +436,7 @@ public class BillingController {
 		}
 		for (int i = 0; i < numTransactions; i++) {
 			JSONObject jElement = orders.getJSONObject(i);
-			Purchase p = Purchase.parse(jElement);
+			Transaction p = Transaction.parse(jElement);
 			purchases.add(p);
 		}
 		return purchases;
@@ -548,9 +548,9 @@ public class BillingController {
 	 * @param context
 	 * @param purchase
 	 *            purchase to unobfuscate.
-	 * @see #obfuscate(Context, Purchase)
+	 * @see #obfuscate(Context, Transaction)
 	 */
-	private static void unobfuscate(Context context, Purchase purchase) {
+	private static void unobfuscate(Context context, Transaction purchase) {
 		final byte[] salt = getSalt();
 		if (salt == null) {
 			return;

@@ -18,7 +18,7 @@
 
 package net.robotmedia.billing.model;
 
-import net.robotmedia.billing.model.Purchase.PurchaseState;
+import net.robotmedia.billing.model.Transaction.PurchaseState;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -28,7 +28,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class BillingDB {
     static final String DATABASE_NAME = "billing.db";
     static final int DATABASE_VERSION = 1;
-    static final String TABLE_PURCHASES = "purchases";
+    static final String TABLE_TRANSACTIONS = "purchases";
 
     public static final String COLUMN__ID = "_id";
     public static final String COLUMN_STATE = "state";
@@ -36,7 +36,7 @@ public class BillingDB {
     public static final String COLUMN_PURCHASE_TIME = "purchaseTime";
     public static final String COLUMN_DEVELOPER_PAYLOAD = "developerPayload";
 
-    private static final String[] TABLE_PURCHASES_COLUMNS = {
+    private static final String[] TABLE_TRANSACTIONS_COLUMNS = {
     	COLUMN__ID, COLUMN_PRODUCT_ID, COLUMN_STATE,
     	COLUMN_PURCHASE_TIME, COLUMN_DEVELOPER_PAYLOAD
     };
@@ -53,28 +53,28 @@ public class BillingDB {
         mDatabaseHelper.close();
     }
 
-    public void insert(Purchase purchase) {
+    public void insert(Transaction transaction) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN__ID, purchase.orderId);
-        values.put(COLUMN_PRODUCT_ID, purchase.productId);
-        values.put(COLUMN_STATE, purchase.purchaseState.ordinal());
-        values.put(COLUMN_PURCHASE_TIME, purchase.purchaseTime);
-        values.put(COLUMN_DEVELOPER_PAYLOAD, purchase.developerPayload);
-        mDb.replace(TABLE_PURCHASES, null /* nullColumnHack */, values);
+        values.put(COLUMN__ID, transaction.orderId);
+        values.put(COLUMN_PRODUCT_ID, transaction.productId);
+        values.put(COLUMN_STATE, transaction.purchaseState.ordinal());
+        values.put(COLUMN_PURCHASE_TIME, transaction.purchaseTime);
+        values.put(COLUMN_DEVELOPER_PAYLOAD, transaction.developerPayload);
+        mDb.replace(TABLE_TRANSACTIONS, null /* nullColumnHack */, values);
     }
     
-    public Cursor queryPurchases() {
-        return mDb.query(TABLE_PURCHASES, TABLE_PURCHASES_COLUMNS, null,
+    public Cursor queryTransactions() {
+        return mDb.query(TABLE_TRANSACTIONS, TABLE_TRANSACTIONS_COLUMNS, null,
                 null, null, null, null);
     }
     
-    public Cursor queryPurchases(String productId, PurchaseState state) {
-        return mDb.query(TABLE_PURCHASES, TABLE_PURCHASES_COLUMNS, COLUMN_PRODUCT_ID + " = ? AND " + COLUMN_STATE + " = ?", 
+    public Cursor queryTransactions(String productId, PurchaseState state) {
+        return mDb.query(TABLE_TRANSACTIONS, TABLE_TRANSACTIONS_COLUMNS, COLUMN_PRODUCT_ID + " = ? AND " + COLUMN_STATE + " = ?", 
                 new String[] {productId, String.valueOf(state.ordinal())}, null, null, null);
     }
     
-    protected static final Purchase createPurchase(Cursor cursor) {
-    	final Purchase purchase = new Purchase();
+    protected static final Transaction createTransaction(Cursor cursor) {
+    	final Transaction purchase = new Transaction();
     	purchase.orderId = cursor.getString(0);
     	purchase.productId = cursor.getString(1);
     	purchase.purchaseState = PurchaseState.valueOf(cursor.getInt(2));
@@ -90,11 +90,11 @@ public class BillingDB {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            createPurchaseTable(db);
+            createTransactionsTable(db);
         }
 
-        private void createPurchaseTable(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + TABLE_PURCHASES + "(" +
+        private void createTransactionsTable(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE " + TABLE_TRANSACTIONS + "(" +
             		COLUMN__ID + " TEXT PRIMARY KEY, " +
             		COLUMN_PRODUCT_ID + " INTEGER, " +
             		COLUMN_STATE + " TEXT, " +
