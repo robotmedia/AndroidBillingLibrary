@@ -46,13 +46,11 @@ import android.util.Log;
 public class BillingController {
 
 	public static enum BillingStatus {
-		UNKNOWN,
-		SUPPORTED,
-		UNSUPPORTED
+		UNKNOWN, SUPPORTED, UNSUPPORTED
 	}
-	
+
 	private static BillingStatus status = BillingStatus.UNKNOWN;
-	
+
 	/**
 	 * Used to provide on-demand values to the billing controller.
 	 */
@@ -60,12 +58,15 @@ public class BillingController {
 
 		/**
 		 * Returns a salt for the obfuscation of purchases in local memory.
+		 * 
 		 * @return array of 20 random bytes.
 		 */
 		public byte[] getObfuscationSalt();
 
 		/**
-		 * Returns the public key used to verify the signature of responses of the Market Billing service.
+		 * Returns the public key used to verify the signature of responses of
+		 * the Market Billing service.
+		 * 
 		 * @return Base64 encoded public key.
 		 */
 		public String getPublicKey();
@@ -102,7 +103,8 @@ public class BillingController {
 	}
 
 	/**
-	 * Returns the billing status. If it is currently unknown, requests to check the billing status, in which case observers should eventually receive a
+	 * Returns the billing status. If it is currently unknown, requests to check
+	 * the billing status, in which case observers should eventually receive a
 	 * {@link IBillingObserver#onBillingChecked(boolean)} notification.
 	 * 
 	 * @param context
@@ -210,8 +212,9 @@ public class BillingController {
 
 	/**
 	 * Returns true if the specified item has been registered as purchased in
-	 * local memory. Note that the item might have been purchased in another
-	 * installation, but not yet registered in this one.
+	 * local memory. Note that if the item was later canceled or refunded this
+	 * will still return true. Also note that the item might have been purchased
+	 * in another installation, but not yet registered in this one.
 	 * 
 	 * @param context
 	 * @param itemId
