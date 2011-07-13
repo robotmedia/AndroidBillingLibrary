@@ -29,6 +29,7 @@ import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionManager;
 import net.robotmedia.billing.request.BillingRequest;
 import net.robotmedia.billing.request.ResponseCode;
+import net.robotmedia.billing.request.RestoreTransactions;
 import net.robotmedia.billing.utils.Compatibility;
 import net.robotmedia.billing.utils.Security;
 
@@ -427,6 +428,8 @@ public class BillingController {
 		}
 	}
 
+	private static HashMap<Long, BillingRequest> pendingRequests = new HashMap<Long, BillingRequest>();
+	
 	/**
 	 * Called after a {@link net.robotmedia.billing.request.BillingRequest} is
 	 * sent.
@@ -440,14 +443,16 @@ public class BillingController {
 		if (debug) {
 			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " of type " + request.getRequestType() + " sent");
 		}
-		if (!request.isSuccess() && request.hasNonce()) {
+		if (request.isSuccess()) {
+			pendingRequests.put(requestId, request);
+		} else if (request.hasNonce()) {
 			Security.removeNonce(request.getNonce());
 		}
 	}
 
 	/**
 	 * Called after a {@link net.robotmedia.billing.request.BillingRequest} is
-	 * sent. Mostly used for debugging purposes.
+	 * sent.
 	 * 
 	 * @param context
 	 * @param requestId
@@ -459,6 +464,11 @@ public class BillingController {
 	protected static void onResponseCode(Context context, long requestId, int responseCode) {
 		if (debug) {
 			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " received response " + ResponseCode.valueOf(responseCode));
+		}
+		final BillingRequest request = pendingRequests.get(requestId);
+		if (request != null) {
+			pendingRequests.remove(requestId);
+			request.onResponseCode(responseCode);
 		}
 	}
 
@@ -637,6 +647,16 @@ public class BillingController {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * 
+	 * @param restoreTransactions
+	 */
+	public static void onTransactionsRestored(RestoreTransactions restoreTransactions) {
+		for (IBillingObserver o : observers) {
+			o.onTransactionsRestored();
+		}		
 	}
 
 }

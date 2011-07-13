@@ -37,8 +37,5 @@ public class ConfirmNotifications extends BillingRequest {
 	protected void addParams(Bundle request) {
 		request.putStringArray(KEY_NOTIFY_IDS, notifyIds);
 	}
-
-	@Override
-	protected void processOkResponse(Bundle response) {}
 	
 }

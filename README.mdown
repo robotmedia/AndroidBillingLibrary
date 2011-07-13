@@ -54,7 +54,7 @@ BillingController
 
 [BillingController][3] provides high-level functions to interact with the Billing service and to query an obfuscated local transaction database.
 
-Since most billing functions are asynchronous, [BillingController][3] notifies all registered [IBillingObserver][4] of the responses. Additionally, [BillingController][3] requires a _BillingController.IConfiguration_ instance from which the public key required to validate signed messages and a salt to obfuscate transactions are obtained.
+Since most billing functions are asynchronous, [BillingController][3] notifies all registered [IBillingObserver][4] of the responses. Additionally, [BillingController][3] requires a `BillingController.IConfiguration` instance from which the public key required to validate signed messages and a salt to obfuscate transactions are obtained.
 
 Disclaimer
 ==========

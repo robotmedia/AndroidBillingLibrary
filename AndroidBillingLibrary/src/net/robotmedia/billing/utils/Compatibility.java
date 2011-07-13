@@ -15,15 +15,18 @@
 
 package net.robotmedia.billing.utils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.util.Log;
 
 public class Compatibility {
     private static Method startIntentSender;
+    public static int START_NOT_STICKY;
     @SuppressWarnings("rawtypes")
 	private static final Class[] START_INTENT_SENDER_SIG = new Class[] {
         IntentSender.class, Intent.class, int.class, int.class, int.class
@@ -34,7 +37,13 @@ public class Compatibility {
 	};
 
 	private static void initCompatibility() {
-        try {
+		try {
+			final Field field = Service.class.getField("START_NOT_STICKY");
+			START_NOT_STICKY = field.getInt(null);
+		} catch (Exception e) {
+			START_NOT_STICKY = 2;			
+		}
+		try {
         	startIntentSender = Activity.class.getMethod("startIntentSender",
                     START_INTENT_SENDER_SIG);
         } catch (SecurityException e) {

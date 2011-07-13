@@ -30,9 +30,6 @@ public class CheckBillingSupported extends BillingRequest {
 	}
 
 	@Override
-	protected void addParams(Bundle request) {}
-
-	@Override
 	protected void processOkResponse(Bundle response) {
 		final boolean supported = this.isSuccess();
 		BillingController.onBillingChecked(supported);

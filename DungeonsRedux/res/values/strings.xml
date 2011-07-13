@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Copyright (C) 2010 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+
+<resources>
+    <string name="welcome">Welcome to the Sample store!</string>
+    <string name="app_name">Dungeons Redux</string>
+    <string name="billing_not_supported_title">Can\'t make purchases</string>
+    <string name="billing_not_supported_message">The Market billing
+     service is not available at this time.  You can continue to use this app but you
+     won\'t be able to make purchases.</string>
+    <string name="restoring_transactions">Restoring transactions</string>
+    <string name="buy">Buy</string>
+    <string name="select_item">Select an item</string>
+    <string name="items_for_sale">Items for sale</string>
+    <string name="items_you_own">Items you own</string>
+    <string name="recent_transactions">Recent activity</string>
+
+    <string name="two_handed_sword">Two-handed sword</string>
+    <string name="potions">Potions</string>
+
+    <!-- The following are reserved skus defined by Market for testing. -->
+    <string name="android_test_canceled">android.test.canceled</string>
+    <string name="android_test_purchased">android.test.purchased</string>
+    <string name="android_test_item_unavailable">android.test.item unavailable</string>
+    <string name="android_test_refunded">android.test.refunded</string>
+</resources>

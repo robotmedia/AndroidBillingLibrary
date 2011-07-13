@@ -55,4 +55,9 @@ public interface IBillingObserver {
 	 */
 	public void onPurchaseRefunded(String itemId);
 
+	/**
+	 * Called after a restore transactions request has been successfully received by the server. 
+	 */
+	public void onTransactionsRestored();
+
 }

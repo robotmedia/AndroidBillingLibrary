@@ -27,33 +27,53 @@ public abstract class BillingRequest {
     private static final String KEY_API_VERSION = "API_VERSION";
     private static final String KEY_PACKAGE_NAME = "PACKAGE_NAME";
     private static final String KEY_RESPONSE_CODE = "RESPONSE_CODE";
-    private static final String KEY_REQUEST_ID = "REQUEST_ID";
+    protected static final String KEY_REQUEST_ID = "REQUEST_ID";
 	private static final String KEY_NONCE = "NONCE";
     public static final long IGNORE_REQUEST_ID = -1;
 	
-    public abstract String getRequestType();
-    protected abstract void addParams(Bundle request);
-    protected abstract void processOkResponse(Bundle response);
-    
-    public boolean hasNonce() {
-    	return false;
-    }
-        
     private String packageName;
     private boolean success;
-	private long nonce;	
+    private long nonce;
+    
+    public BillingRequest(String packageName) {
+    	this.packageName = packageName;
+    }
+        
+    protected void addParams(Bundle request) {
+    	// Do nothing by default
+    }
     
     public long getNonce() {
 		return nonce;
 	}
-	public void setNonce(long nonce) {
-		this.nonce = nonce;
-	}
-	public BillingRequest(String packageName) {
-    	this.packageName = packageName;
+	public abstract String getRequestType();	
+    
+    public boolean hasNonce() {
+    	return false;
+    }
+	public boolean isSuccess() {
+    	return success;
+    }
+	protected Bundle makeRequestBundle() {
+        final Bundle request = new Bundle();
+        request.putString(KEY_BILLING_REQUEST, getRequestType());
+        request.putInt(KEY_API_VERSION, 1);
+        request.putString(KEY_PACKAGE_NAME, packageName);
+        if (hasNonce()) {
+    		request.putLong(KEY_NONCE, nonce);
+        }
+        return request;
     }
     
-	public long run(IMarketBillingService mService) throws RemoteException {
+	public void onResponseCode(int responseCode) {
+    	// Do nothing by default
+	}
+
+    protected void processOkResponse(Bundle response) {    	
+    	// Do nothing by default
+    }
+	
+    public long run(IMarketBillingService mService) throws RemoteException {
         final Bundle request = makeRequestBundle();
         addParams(request);
         final Bundle response = mService.sendBillingRequest(request);
@@ -64,28 +84,17 @@ public abstract class BillingRequest {
         	return IGNORE_REQUEST_ID;
         }
 	}
-
-    protected Bundle makeRequestBundle() {
-        final Bundle request = new Bundle();
-        request.putString(KEY_BILLING_REQUEST, getRequestType());
-        request.putInt(KEY_API_VERSION, 1);
-        request.putString(KEY_PACKAGE_NAME, packageName);
-        if (hasNonce()) {
-    		request.putLong(KEY_NONCE, nonce);
-        }
-        return request;
-    }
-	
+    
+    public void setNonce(long nonce) {
+		this.nonce = nonce;
+	}
+    
     protected boolean validateResponse(Bundle response) {
     	final int responseCode = response.getInt(KEY_RESPONSE_CODE);
     	success = ResponseCode.isResponseOk(responseCode);
     	if (!success) {
     		Log.w(this.getClass().getSimpleName(), "Error with response code " + ResponseCode.valueOf(responseCode));
     	}
-    	return success;
-    }
-    
-    public boolean isSuccess() {
     	return success;
     }
     

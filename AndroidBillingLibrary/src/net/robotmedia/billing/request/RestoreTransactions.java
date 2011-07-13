@@ -15,7 +15,7 @@
 
 package net.robotmedia.billing.request;
 
-import android.os.Bundle;
+import net.robotmedia.billing.BillingController;
 
 public class RestoreTransactions extends BillingRequest {
 	
@@ -29,11 +29,13 @@ public class RestoreTransactions extends BillingRequest {
 	public String getRequestType() {
 		return "RESTORE_TRANSACTIONS";
 	}
-
+	
 	@Override
-	protected void addParams(Bundle request) {}
-
-	@Override
-	protected void processOkResponse(Bundle response) {}
+	public void onResponseCode(int responseCode) {
+		super.onResponseCode(responseCode);
+		if (ResponseCode.isResponseOk(responseCode)) {
+			BillingController.onTransactionsRestored(this);
+		}
+	}
 	
 }

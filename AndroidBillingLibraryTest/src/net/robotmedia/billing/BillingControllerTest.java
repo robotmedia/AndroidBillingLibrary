@@ -15,14 +15,19 @@
 
 package net.robotmedia.billing;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.robotmedia.billing.model.BillingDB;
 import net.robotmedia.billing.model.BillingDBTest;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionTest;
+import net.robotmedia.billing.request.RestoreTransactions;
+import android.app.PendingIntent;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
+import android.test.suitebuilder.annotation.SmallTest;
 
 public class BillingControllerTest extends AndroidTestCase {
 
@@ -98,5 +103,28 @@ public class BillingControllerTest extends AndroidTestCase {
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
 		final List<Transaction> transactions2 = BillingController.getTransactions(getContext(), TransactionTest.TRANSACTION_1.productId);
 		assertEquals(transactions2.size(), 1);
+	}
+	
+	@SmallTest
+	public void testOnTransactionRestored() throws Exception {
+		final Set<Boolean> flags = new HashSet<Boolean>();
+		final IBillingObserver observer = new IBillingObserver() {
+			
+			@Override
+			public void onTransactionsRestored() {
+				flags.add(true);
+			}
+			
+			public void onPurchaseRefunded(String itemId) {}
+			public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {}
+			public void onPurchaseExecuted(String itemId) {}
+			public void onPurchaseCancelled(String itemId) {}
+			public void onBillingChecked(boolean supported) {}
+		};
+		BillingController.registerObserver(observer);
+		final RestoreTransactions request = new RestoreTransactions(getContext().getPackageName());
+		BillingController.onTransactionsRestored(request);
+		assertEquals(flags.size(), 1);
+		BillingController.unregisterObserver(observer);
 	}
 }

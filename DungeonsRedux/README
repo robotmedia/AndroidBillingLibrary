@@ -1,0 +1,56 @@
+This package contains a sample app -Dungeons Redux- that shows how to use the Android Billing 
+Library (https://github.com/robotmedia/AndroidBillingLibrary). It does not intend to be an 
+example of how to use in-app billing in general.
+
+Dungeons Redux is a simplified version of the Dungeons sample app provided by Google.
+
+-------------------------------------
+Configuring the sample application
+-------------------------------------
+
+Before you can run the sample application, you need to add your Android Market public key to the
+sample application code. This enables the application to verify the signature of the transaction
+information that's returned from Android Market. To add your public key to the sample application
+code, do the following:
+
+1. Log in to your Android Market publisher account (http://market.android.com/publish).
+2. On the upper left part of the page, under your name, click Edit Profile.
+3. On the Edit Profile page, scroll down to the Licensing & In-app Billing panel.
+4. Copy your public key to the clipboard.
+5. Open src/net/robotmedia/billing/example/Dungeons.java in the editor of your choice.
+6. Search for the following line:
+   return "your public key here";
+7. Replace the string with your public key.
+8. Save the file.
+
+After you add your public key to the Dungeons.java file, you can compile the application as you
+normally would.
+
+-------------------------------------
+Running the sample application
+-------------------------------------
+
+You cannot run the sample application in the emulator. You must load the application onto a device
+to run it.
+
+In-app billing requires version 2.3.0 of the Android Market application. To run the sample
+application you must have this version (or a newer version) installed on your device. You can check
+the version of the Android Market application by doing the following:
+
+1. Open Settings on your device and touch Applications.
+2. In Application Settings, touch Manage applications.
+3. Touch All to list all applications.
+4. Scroll down and touch the Market application.
+5. The version number appears under Market at the top of the screen.
+
+-------------------------------------
+Additional information and resources
+-------------------------------------
+
+To learn more about the in-app billing service, see the online documentation:
+
+	http://developer.android.com/guide/market/billing/index.html
+
+To learn more about Android Billing Library, see:
+
+	https://github.com/robotmedia/AndroidBillingLibrary

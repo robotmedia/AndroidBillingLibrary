@@ -23,6 +23,7 @@ import net.robotmedia.billing.request.GetPurchaseInformation;
 import net.robotmedia.billing.request.RequestPurchase;
 import net.robotmedia.billing.request.RestoreTransactions;
 import net.robotmedia.billing.request.BillingRequest;
+import net.robotmedia.billing.utils.Compatibility;
 
 import com.android.vending.billing.IMarketBillingService;
 
@@ -163,10 +164,10 @@ public class BillingService extends Service implements ServiceConnection {
 	    handleCommand(intent);
 	}
 
-	@Override
+	// @Override // Avoid compile errors on pre-2.0
 	public int onStartCommand(Intent intent, int flags, int startId) {
 	    handleCommand(intent);
-	    return START_NOT_STICKY;
+	    return Compatibility.START_NOT_STICKY;
 	}
 	
 	private void handleCommand(Intent intent) {

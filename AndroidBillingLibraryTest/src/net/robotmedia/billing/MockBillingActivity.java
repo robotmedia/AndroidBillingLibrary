@@ -53,4 +53,9 @@ public class MockBillingActivity extends AbstractBillingActivity {
 		return null;
 	}
 
+	@Override
+	public void onTransactionsRestored() {
+		// TODO Auto-generated method stub
+	}
+
 }

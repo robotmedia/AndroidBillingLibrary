@@ -22,8 +22,8 @@ public class Transaction {
 
     public enum PurchaseState {
         // Responses to requestPurchase or restoreTransactions.
-    	PURCHASED,    // 0: The charge failed on the server.
-        CANCELLED,   // 1: User was charged for the order.
+    	PURCHASED,    // 0: User was charged for the order.
+        CANCELLED,   // 1: The charge failed on the server.
     	REFUNDED;    // 2: User received a refund for the order.
 
         // Converts from an ordinal value to the PurchaseState
