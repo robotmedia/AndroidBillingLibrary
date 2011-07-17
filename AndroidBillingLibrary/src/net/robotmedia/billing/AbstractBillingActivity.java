@@ -24,7 +24,7 @@ import android.preference.PreferenceManager;
 
 public abstract class AbstractBillingActivity extends Activity implements IBillingObserver, BillingController.IConfiguration {
 
-	private static final String PREFERENCE_SUBSEQUENT_SESSION = "net.robotmedia.billing.AbstractBillingActivity.subsequentSession";;
+	private static final String KEY_TRANSACTIONS_RESTORED = "net.robotmedia.billing.AbstractBillingActivity.transactionsRestored";
 
 	/**
 	 * Returns the billing status. If it's currently unknown, requests to check
@@ -39,15 +39,11 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 		return BillingController.checkBillingSupported(this);
 	}
 
-	private boolean isSubsequentSession() {
+	private boolean isTransactionsRestored() {
 		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		final boolean subsequentSession = preferences.getBoolean(PREFERENCE_SUBSEQUENT_SESSION, false);
-		final Editor editor = preferences.edit();
-		editor.putBoolean(PREFERENCE_SUBSEQUENT_SESSION, true);
-		editor.commit();
-		return subsequentSession;
+		return preferences.getBoolean(KEY_TRANSACTIONS_RESTORED, false);
 	}
-
+	
 	@Override
 	protected void onCreate(android.os.Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,7 +52,7 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 		BillingController.setConfiguration(this); // This activity will provide
 													// the public key and salt
 		this.checkBillingSupported();
-		if (!isSubsequentSession()) {
+		if (!isTransactionsRestored()) {
 			BillingController.restoreTransactions(this);
 		}
 	};
@@ -84,6 +80,14 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 		BillingController.startPurchaseIntent(this, purchaseIntent, null);
 	}
 
+	@Override
+	public void onTransactionsRestored() {
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		final Editor editor = preferences.edit();
+		editor.putBoolean(KEY_TRANSACTIONS_RESTORED, true);
+		editor.commit();
+	}
+
 	/**
 	 * Requests the purchase of the specified item. The transaction will not be
 	 * confirmed automatically; such confirmation could be handled in
@@ -98,7 +102,7 @@ public abstract class AbstractBillingActivity extends Activity implements IBilli
 	public void requestPurchase(String itemId) {
 		BillingController.requestPurchase(this, itemId);
 	}
-
+	
 	/**
 	 * Requests to restore all transactions.
 	 */

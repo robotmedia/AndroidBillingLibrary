@@ -84,7 +84,7 @@ public class BillingDBTest extends AndroidTestCase {
 		TransactionTest.assertEquals(TransactionTest.TRANSACTION_1, stored);
 		cursor2.close();
 
-		mData.insert(TransactionTest.TRANSACTION_2);
+		mData.insert(TransactionTest.TRANSACTION_2_REFUNDED);
 		final Cursor cursor3 = mData.queryTransactions();
 		assertEquals(cursor3.getCount(), 2);
 		cursor3.close();
@@ -106,7 +106,7 @@ public class BillingDBTest extends AndroidTestCase {
 		TransactionTest.assertEquals(TransactionTest.TRANSACTION_1, stored);
 		cursor2.close();
 
-		mData.insert(TransactionTest.TRANSACTION_2);
+		mData.insert(TransactionTest.TRANSACTION_2_REFUNDED);
 		final Cursor cursor3 = mData.queryTransactions(TransactionTest.TRANSACTION_1.productId);
 		assertEquals(cursor3.getCount(), 1);
 		cursor3.close();
@@ -119,7 +119,7 @@ public class BillingDBTest extends AndroidTestCase {
 		cursor1.close();
 
 		mData.insert(TransactionTest.TRANSACTION_1);
-		mData.insert(TransactionTest.TRANSACTION_2);
+		mData.insert(TransactionTest.TRANSACTION_2_REFUNDED);
 		final Cursor cursor2 = mData.queryTransactions(TransactionTest.TRANSACTION_1.productId, TransactionTest.TRANSACTION_1.purchaseState);
 		assertEquals(cursor2.getCount(), 1);
 		cursor2.moveToNext();

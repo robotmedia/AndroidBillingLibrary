@@ -64,7 +64,7 @@ public class TransactionManagerTest extends AndroidTestCase {
 		TransactionManager.addTransaction(getContext(), TransactionTest.TRANSACTION_1);
 		final List<Transaction> transactions2 = TransactionManager.getTransactions(getContext());
 		assertEquals(transactions2.size(), 1);
-		TransactionManager.addTransaction(getContext(), TransactionTest.TRANSACTION_2);
+		TransactionManager.addTransaction(getContext(), TransactionTest.TRANSACTION_2_REFUNDED);
 		final List<Transaction> transactions3 = TransactionManager.getTransactions(getContext());
 		assertEquals(transactions3.size(), 2);
 	}
@@ -76,7 +76,7 @@ public class TransactionManagerTest extends AndroidTestCase {
 		TransactionManager.addTransaction(getContext(), TransactionTest.TRANSACTION_1);
 		final List<Transaction> transactions2 = TransactionManager.getTransactions(getContext(), TransactionTest.TRANSACTION_1.productId);
 		assertEquals(transactions2.size(), 1);
-		TransactionManager.addTransaction(getContext(), TransactionTest.TRANSACTION_2);
+		TransactionManager.addTransaction(getContext(), TransactionTest.TRANSACTION_2_REFUNDED);
 		final List<Transaction> transactions3 = TransactionManager.getTransactions(getContext(), TransactionTest.TRANSACTION_1.productId);
 		assertEquals(transactions3.size(), 1);
 	}

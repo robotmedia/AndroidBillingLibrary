@@ -172,7 +172,7 @@ public class BillingController {
 	 * @return number of net purchases for the specified item.
 	 */
 	public static int countPurchasesNet(Context context, String itemId) {
-		final List<Transaction> transactions = BillingController.getTransactions(context);
+		final List<Transaction> transactions = BillingController.getTransactions(context, itemId);
 		int count = 0;
 		for (Transaction t : transactions) {
 			switch (t.purchaseState) {

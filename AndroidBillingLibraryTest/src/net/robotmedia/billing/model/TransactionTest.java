@@ -26,7 +26,8 @@ import junit.framework.TestCase;
 public class TransactionTest extends TestCase {
 	
 	public static final Transaction TRANSACTION_1 = new Transaction("order1", "android.test.purchased", "com.example", Transaction.PurchaseState.PURCHASED, "notificationId", new Date().getTime(), "developerPayload");
-	public static final Transaction TRANSACTION_2 = new Transaction("order2", "android.test.refunded", "com.example", Transaction.PurchaseState.REFUNDED, "notificationId", new Date().getTime(), "developerPayload");
+	public static final Transaction TRANSACTION_2 = new Transaction("order2", "product_2", "com.example", Transaction.PurchaseState.PURCHASED, "notificationId", new Date().getTime(), "developerPayload");
+	public static final Transaction TRANSACTION_2_REFUNDED = new Transaction("order4", "product_2", "com.example", Transaction.PurchaseState.REFUNDED, "notificationId", new Date().getTime(), "developerPayload");
 	public static final Transaction TRANSACTION_1_REFUNDED = new Transaction("order3", "android.test.purchased", "com.example", Transaction.PurchaseState.REFUNDED, "notificationId", new Date().getTime(), "developerPayload");
 	public static void assertEquals(Transaction a, Transaction b) {
 		assertTrue(a.equals(b));
@@ -74,7 +75,7 @@ public class TransactionTest extends TestCase {
 	public void testEquals() throws Exception {
 		assertTrue(TRANSACTION_1.equals(TRANSACTION_1));
 		assertTrue(TRANSACTION_1.equals(TRANSACTION_1.clone()));
-		assertFalse(TRANSACTION_1.equals(TRANSACTION_2));
+		assertFalse(TRANSACTION_1.equals(TRANSACTION_2_REFUNDED));
 	}
 	
 	@SmallTest

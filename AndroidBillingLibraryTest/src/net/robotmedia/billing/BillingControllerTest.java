@@ -61,6 +61,8 @@ public class BillingControllerTest extends AndroidTestCase {
 		assertTrue(BillingController.isPurchasedNet(getContext(), TransactionTest.TRANSACTION_1.productId));
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1_REFUNDED);
 		assertFalse(BillingController.isPurchasedNet(getContext(), TransactionTest.TRANSACTION_1.productId));
+		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
+		assertFalse(BillingController.isPurchasedNet(getContext(), TransactionTest.TRANSACTION_1.productId));
 	}
 	
 	@MediumTest
@@ -69,6 +71,8 @@ public class BillingControllerTest extends AndroidTestCase {
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1);
 		assertEquals(BillingController.countPurchases(getContext(), TransactionTest.TRANSACTION_1.productId), 1);
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1_REFUNDED);
+		assertEquals(BillingController.countPurchases(getContext(), TransactionTest.TRANSACTION_1.productId), 1);
+		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
 		assertEquals(BillingController.countPurchases(getContext(), TransactionTest.TRANSACTION_1.productId), 1);
 	}
 	
@@ -79,6 +83,8 @@ public class BillingControllerTest extends AndroidTestCase {
 		assertEquals(BillingController.countPurchasesNet(getContext(), TransactionTest.TRANSACTION_1.productId), 1);
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1_REFUNDED);
 		assertEquals(BillingController.countPurchasesNet(getContext(), TransactionTest.TRANSACTION_1.productId), 0);
+		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
+		assertEquals(BillingController.countPurchasesNet(getContext(), TransactionTest.TRANSACTION_1.productId), 0);
 	}
 	
 	@MediumTest
@@ -88,7 +94,7 @@ public class BillingControllerTest extends AndroidTestCase {
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1);
 		final List<Transaction> transactions1 = BillingController.getTransactions(getContext());
 		assertEquals(transactions1.size(), 1);
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
+		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2_REFUNDED);
 		final List<Transaction> transactions2 = BillingController.getTransactions(getContext());
 		assertEquals(transactions2.size(), 2);
 	}
@@ -100,7 +106,7 @@ public class BillingControllerTest extends AndroidTestCase {
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1);
 		final List<Transaction> transactions1 = BillingController.getTransactions(getContext(), TransactionTest.TRANSACTION_1.productId);
 		assertEquals(transactions1.size(), 1);
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
+		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2_REFUNDED);
 		final List<Transaction> transactions2 = BillingController.getTransactions(getContext(), TransactionTest.TRANSACTION_1.productId);
 		assertEquals(transactions2.size(), 1);
 	}
