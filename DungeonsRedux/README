@@ -1,8 +1,8 @@
-This package contains a sample app -Dungeons Redux- that shows how to use the Android Billing 
-Library (https://github.com/robotmedia/AndroidBillingLibrary). It does not intend to be an 
-example of how to use in-app billing in general.
+Dungeons Redux is a sample app that shows how to use the Android Billing Library by Robot Media. 
+It is a simplified version of the Dungeons in-app billing sample app provided by Google.
 
-Dungeons Redux is a simplified version of the Dungeons sample app provided by Google.
+Dungeons Redux does not intend to be an example of how to use in-app billing in general, just 
+Android Billing Library.
 
 -------------------------------------
 Configuring the sample application
@@ -17,13 +17,13 @@ code, do the following:
 2. On the upper left part of the page, under your name, click Edit Profile.
 3. On the Edit Profile page, scroll down to the Licensing & In-app Billing panel.
 4. Copy your public key to the clipboard.
-5. Open src/net/robotmedia/billing/example/Dungeons.java in the editor of your choice.
+5. Open src/net/robotmedia/billing/example/Application.java in the editor of your choice.
 6. Search for the following line:
    return "your public key here";
 7. Replace the string with your public key.
 8. Save the file.
 
-After you add your public key to the Dungeons.java file, you can compile the application as you
+After you add your public key to the Application.java file, you can compile the application as you
 normally would.
 
 -------------------------------------

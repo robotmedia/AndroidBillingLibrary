@@ -24,9 +24,9 @@ import java.util.List;
 
 import net.robotmedia.billing.BillingController;
 import net.robotmedia.billing.IBillingObserver;
-import net.robotmedia.billing.BillingController.IConfiguration;
 import net.robotmedia.billing.example.R;
-import net.robotmedia.billing.example.CatalogEntry.Managed;
+import net.robotmedia.billing.example.aux.CatalogAdapter;
+import net.robotmedia.billing.example.aux.CatalogEntry;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
 
@@ -34,7 +34,7 @@ import net.robotmedia.billing.model.Transaction.PurchaseState;
  * A sample application based on the original Dungeons to demonstrate how to use
  * BillingController and implement IBillingObserver.
  */
-public class Dungeons extends Activity implements IBillingObserver, IConfiguration {
+public class Dungeons extends Activity implements IBillingObserver {
 
 	private static final String TAG = "Dungeons";
 
@@ -50,14 +50,6 @@ public class Dungeons extends Activity implements IBillingObserver, IConfigurati
 
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
 
-	/** An array of product list entries for the products that can be purchased. */
-	private static final CatalogEntry[] CATALOG = new CatalogEntry[] {
-			new CatalogEntry("sword_001", R.string.two_handed_sword, Managed.MANAGED),
-			new CatalogEntry("potion_001", R.string.potions, Managed.UNMANAGED),
-			new CatalogEntry("android.test.purchased", R.string.android_test_purchased, Managed.UNMANAGED),
-			new CatalogEntry("android.test.canceled", R.string.android_test_canceled, Managed.UNMANAGED),
-			new CatalogEntry("android.test.refunded", R.string.android_test_refunded, Managed.UNMANAGED),
-			new CatalogEntry("android.test.item_unavailable", R.string.android_test_item_unavailable, Managed.UNMANAGED), };
 	private String mSku;
 
 	private CatalogAdapter mCatalogAdapter;
@@ -99,8 +91,6 @@ public class Dungeons extends Activity implements IBillingObserver, IConfigurati
 		setContentView(R.layout.main);
 
 		setupWidgets();
-		BillingController.setDebug(true);
-		BillingController.setConfiguration(this);
 		BillingController.registerObserver(this);
 		BillingController.checkBillingSupported(this);
 		updateOwnedItems();
@@ -140,7 +130,6 @@ public class Dungeons extends Activity implements IBillingObserver, IConfigurati
 	@Override
 	protected void onDestroy() {
 		BillingController.unregisterObserver(this);
-		BillingController.setConfiguration(null);
 		super.onDestroy();
 	}
 
@@ -182,12 +171,12 @@ public class Dungeons extends Activity implements IBillingObserver, IConfigurati
 		});
 
 		mSelectItemSpinner = (Spinner) findViewById(R.id.item_choices);
-		mCatalogAdapter = new CatalogAdapter(this, CATALOG);
+		mCatalogAdapter = new CatalogAdapter(this, CatalogEntry.CATALOG);
 		mSelectItemSpinner.setAdapter(mCatalogAdapter);
 		mSelectItemSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				mSku = CATALOG[position].sku;
+				mSku = CatalogEntry.CATALOG[position].sku;
 			}
 
 			public void onNothingSelected(AdapterView<?> arg0) {
@@ -196,15 +185,5 @@ public class Dungeons extends Activity implements IBillingObserver, IConfigurati
 		});
 
 		mOwnedItemsTable = (ListView) findViewById(R.id.owned_items);
-	}
-
-	@Override
-	public byte[] getObfuscationSalt() {
-		return new byte[] {41, -90, -116, -41, 66, -53, 122, -110, -127, -96, -88, 77, 127, 115, 1, 73, 57, 110, 48, -116};
-	}
-
-	@Override
-	public String getPublicKey() {
-		return "your public key here";
 	}
 }

@@ -6,7 +6,7 @@
     <!-- Add this permission to your manifest -->
 	<uses-permission android:name="com.android.vending.BILLING" />
 
-	<application android:icon="@drawable/icon" android:label="@string/app_name">
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:name=".Application">
 		<activity android:name=".Dungeons" android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
