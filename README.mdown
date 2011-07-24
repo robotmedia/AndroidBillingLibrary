@@ -45,9 +45,9 @@ Subclassing AbstractBillingActivity
 
 When created your [AbstractBillingActivity][2] instance will check if in-app billing is supported, followed by a call to `onBillingChecked(boolean)`, which has to be implemented by the subclass.
 
-Additionally, your [AbstractBillingActivity][2] subclass will attempt to restore all transactions, only once. This is necessary in case the user has previously installed the app and made purchases. Existing transactions will generate calls to `onPurchaseExecuted(String)`, `onPurchaseCancelled(String)` and `onPurchaseRefunded(String)` accordingly, all of which have to be implemented by the subclass.
+Additionally, your [AbstractBillingActivity][2] subclass will attempt to restore all transactions, only once. This is necessary in case the user has previously installed the app and made purchases. Existing transactions will generate calls to `onPurchaseStateChange(String, PurchaseState)`, which has to be implemented by the subclass.
 
-Starting a purchase is as simple as calling `requestPurchase(String)`. [AbstractBillingActivity][2] will start the Android Market intent automatically and `onPurchase{State}(String)` will be called after the transaction is confirmed.
+Starting a purchase is as simple as calling `requestPurchase(String)`. [AbstractBillingActivity][2] will start the Android Market intent automatically and `onPurchaseStateChange(String, PurchaseState)` will be called after the transaction is confirmed.
 
 If you override any of the methods provided by [AbstractBillingActivity][2], make sure to call the superclass implementation.
 

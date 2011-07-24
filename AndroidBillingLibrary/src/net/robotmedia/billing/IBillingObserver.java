@@ -15,6 +15,7 @@
 
 package net.robotmedia.billing;
 
+import net.robotmedia.billing.model.Transaction.PurchaseState;
 import net.robotmedia.billing.request.ResponseCode;
 import android.app.PendingIntent;
 
@@ -30,26 +31,6 @@ public interface IBillingObserver {
 	public void onBillingChecked(boolean supported);
 
 	/**
-	 * Called after the purchase of the specified item was cancelled.
-	 * 
-	 * @param itemId
-	 *            id of the item whose purchase was cancelled.
-	 * @see BillingController#startPurchaseIntent(android.app.Activity,
-	 *      PendingIntent, android.content.Intent)
-	 */
-	public void onPurchaseCancelled(String itemId);
-
-	/**
-	 * Called after the purchase of the specified item was executed.
-	 * 
-	 * @param itemId
-	 *            id of the item whose purchase was executed.
-	 * @see BillingController#startPurchaseIntent(android.app.Activity,
-	 *      PendingIntent, android.content.Intent)
-	 */
-	public void onPurchaseExecuted(String itemId);
-
-	/**
 	 * Called after requesting the purchase of the specified item.
 	 * 
 	 * @param itemId
@@ -62,14 +43,14 @@ public interface IBillingObserver {
 	public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent);
 
 	/**
-	 * Called after the purchase of the specified item was refunded.
+	 * Called when the specified item is purchased, cancelled or refunded.
 	 * 
 	 * @param itemId
-	 *            id of the item whose purchase was refunded.
-	 * @see BillingController#startPurchaseIntent(android.app.Activity,
-	 *      PendingIntent, android.content.Intent)
+	 *            id of the item whose purchase state has changed.
+	 * @param state
+	 *            purchase state of the specified item.
 	 */
-	public void onPurchaseRefunded(String itemId);
+	public void onPurchaseStateChanged(String itemId, PurchaseState state);
 
 	/**
 	 * Called with the response for the purchase request of the specified item.

@@ -23,6 +23,7 @@ import net.robotmedia.billing.model.BillingDB;
 import net.robotmedia.billing.model.BillingDBTest;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionTest;
+import net.robotmedia.billing.model.Transaction.PurchaseState;
 import net.robotmedia.billing.request.ResponseCode;
 import android.app.PendingIntent;
 import android.test.AndroidTestCase;
@@ -118,12 +119,10 @@ public class BillingControllerTest extends AndroidTestCase {
 			public void onTransactionsRestored() {
 				flags.add(true);
 			}
-			public void onPurchaseRefunded(String itemId) {}
 			public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {}
-			public void onPurchaseExecuted(String itemId) {}
-			public void onPurchaseCancelled(String itemId) {}
 			public void onBillingChecked(boolean supported) {}
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {}
+			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onTransactionsRestored();
@@ -139,16 +138,15 @@ public class BillingControllerTest extends AndroidTestCase {
 		final IBillingObserver observer = new IBillingObserver() {
 			
 			public void onTransactionsRestored() {}
-			public void onPurchaseRefunded(String itemId) {}
 			public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {}
-			public void onPurchaseExecuted(String itemId) {}
-			public void onPurchaseCancelled(String itemId) {}
 			public void onBillingChecked(boolean supported) {}
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { 
 				flags.add(true);
 				assertEquals(testItemId, itemId);
 				assertEquals(testResponse, response);
 			}
+			@Override
+			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onRequestPurchaseResponse(testItemId, testResponse);

@@ -15,30 +15,13 @@
 
 package net.robotmedia.billing;
 
+import net.robotmedia.billing.model.Transaction.PurchaseState;
 import net.robotmedia.billing.request.ResponseCode;
 
 public class MockBillingActivity extends AbstractBillingActivity {
 
 	@Override
 	public void onBillingChecked(boolean supported) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onPurchaseCancelled(String itemId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onPurchaseExecuted(String itemId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onPurchaseRefunded(String itemId) {
 		// TODO Auto-generated method stub
 
 	}
@@ -62,6 +45,11 @@ public class MockBillingActivity extends AbstractBillingActivity {
 
 	@Override
 	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onPurchaseStateChanged(String itemId, PurchaseState state) {
 		// TODO Auto-generated method stub
 	}
 

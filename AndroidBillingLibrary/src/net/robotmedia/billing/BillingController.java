@@ -299,17 +299,7 @@ public class BillingController {
 	 */
 	private static void notifyPurchaseStateChange(String itemId, Transaction.PurchaseState state) {
 		for (IBillingObserver o : observers) {
-			switch (state) {
-			case CANCELLED:
-				o.onPurchaseCancelled(itemId);
-				break;
-			case PURCHASED:
-				o.onPurchaseExecuted(itemId);
-				break;
-			case REFUNDED:
-				o.onPurchaseRefunded(itemId);
-				break;
-			}
+			o.onPurchaseStateChanged(itemId, state);
 		}
 	}
 
