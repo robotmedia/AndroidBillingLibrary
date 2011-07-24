@@ -15,6 +15,8 @@
 
 package net.robotmedia.billing;
 
+import net.robotmedia.billing.request.ResponseCode;
+
 public class MockBillingActivity extends AbstractBillingActivity {
 
 	@Override
@@ -55,6 +57,11 @@ public class MockBillingActivity extends AbstractBillingActivity {
 
 	@Override
 	public void onTransactionsRestored() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
 		// TODO Auto-generated method stub
 	}
 

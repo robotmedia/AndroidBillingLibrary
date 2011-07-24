@@ -29,7 +29,6 @@ import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionManager;
 import net.robotmedia.billing.request.BillingRequest;
 import net.robotmedia.billing.request.ResponseCode;
-import net.robotmedia.billing.request.RestoreTransactions;
 import net.robotmedia.billing.security.DefaultSignatureValidator;
 import net.robotmedia.billing.security.ISignatureValidator;
 import net.robotmedia.billing.utils.Compatibility;
@@ -471,20 +470,17 @@ public class BillingController {
 	 * @see net.robotmedia.billing.request.ResponseCode
 	 */
 	protected static void onResponseCode(Context context, long requestId, int responseCode) {
-		debug("Request " + requestId + " received response " + ResponseCode.valueOf(responseCode));
+		final ResponseCode response = ResponseCode.valueOf(responseCode);
+		debug("Request " + requestId + " received response " + response);
 
 		final BillingRequest request = pendingRequests.get(requestId);
 		if (request != null) {
 			pendingRequests.remove(requestId);
-			request.onResponseCode(responseCode);
+			request.onResponseCode(response);
 		}
 	}
 
-	/**
-	 * 
-	 * @param restoreTransactions
-	 */
-	public static void onTransactionsRestored(RestoreTransactions restoreTransactions) {
+	public static void onTransactionsRestored() {
 		for (IBillingObserver o : observers) {
 			o.onTransactionsRestored();
 		}
@@ -677,6 +673,12 @@ public class BillingController {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	public static void onRequestPurchaseResponse(String itemId, ResponseCode response) {
+		for (IBillingObserver o : observers) {
+			o.onRequestPurchaseResponse(itemId, response);
 		}
 	}
 

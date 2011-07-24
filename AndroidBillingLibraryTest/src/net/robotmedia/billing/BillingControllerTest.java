@@ -23,7 +23,7 @@ import net.robotmedia.billing.model.BillingDB;
 import net.robotmedia.billing.model.BillingDBTest;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionTest;
-import net.robotmedia.billing.request.RestoreTransactions;
+import net.robotmedia.billing.request.ResponseCode;
 import android.app.PendingIntent;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
@@ -115,21 +115,43 @@ public class BillingControllerTest extends AndroidTestCase {
 	public void testOnTransactionRestored() throws Exception {
 		final Set<Boolean> flags = new HashSet<Boolean>();
 		final IBillingObserver observer = new IBillingObserver() {
-			
-			@Override
 			public void onTransactionsRestored() {
 				flags.add(true);
 			}
-			
 			public void onPurchaseRefunded(String itemId) {}
 			public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {}
 			public void onPurchaseExecuted(String itemId) {}
 			public void onPurchaseCancelled(String itemId) {}
 			public void onBillingChecked(boolean supported) {}
+			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {}
 		};
 		BillingController.registerObserver(observer);
-		final RestoreTransactions request = new RestoreTransactions(getContext().getPackageName());
-		BillingController.onTransactionsRestored(request);
+		BillingController.onTransactionsRestored();
+		assertEquals(flags.size(), 1);
+		BillingController.unregisterObserver(observer);
+	}
+	
+	@SmallTest
+	public void testOnRequestPurchaseResponse() throws Exception {
+		final String testItemId = TransactionTest.TRANSACTION_1.productId;
+		final ResponseCode testResponse = ResponseCode.RESULT_OK;
+		final Set<Boolean> flags = new HashSet<Boolean>();
+		final IBillingObserver observer = new IBillingObserver() {
+			
+			public void onTransactionsRestored() {}
+			public void onPurchaseRefunded(String itemId) {}
+			public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {}
+			public void onPurchaseExecuted(String itemId) {}
+			public void onPurchaseCancelled(String itemId) {}
+			public void onBillingChecked(boolean supported) {}
+			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { 
+				flags.add(true);
+				assertEquals(testItemId, itemId);
+				assertEquals(testResponse, response);
+			}
+		};
+		BillingController.registerObserver(observer);
+		BillingController.onRequestPurchaseResponse(testItemId, testResponse);
 		assertEquals(flags.size(), 1);
 		BillingController.unregisterObserver(observer);
 	}

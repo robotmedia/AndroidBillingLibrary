@@ -29,6 +29,7 @@ import net.robotmedia.billing.example.aux.CatalogAdapter;
 import net.robotmedia.billing.example.aux.CatalogEntry;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
+import net.robotmedia.billing.request.ResponseCode;
 
 /**
  * A sample application based on the original Dungeons to demonstrate how to use
@@ -186,4 +187,7 @@ public class Dungeons extends Activity implements IBillingObserver {
 
 		mOwnedItemsTable = (ListView) findViewById(R.id.owned_items);
 	}
+
+	@Override
+	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {}
 }

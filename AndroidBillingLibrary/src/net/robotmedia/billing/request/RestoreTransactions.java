@@ -31,10 +31,10 @@ public class RestoreTransactions extends BillingRequest {
 	}
 	
 	@Override
-	public void onResponseCode(int responseCode) {
-		super.onResponseCode(responseCode);
-		if (ResponseCode.isResponseOk(responseCode)) {
-			BillingController.onTransactionsRestored(this);
+	public void onResponseCode(ResponseCode response) {
+		super.onResponseCode(response);
+		if (response == ResponseCode.RESULT_OK) {
+			BillingController.onTransactionsRestored();
 		}
 	}
 	

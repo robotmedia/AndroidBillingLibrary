@@ -65,7 +65,7 @@ public abstract class BillingRequest {
         return request;
     }
     
-	public void onResponseCode(int responseCode) {
+	public void onResponseCode(ResponseCode responde) {
     	// Do nothing by default
 	}
 

@@ -53,4 +53,11 @@ public class RequestPurchase extends BillingRequest {
 		BillingController.onPurchaseIntent(itemId, purchaseIntent);
 	}
 	
+	@Override
+	public void onResponseCode(ResponseCode response) {
+		super.onResponseCode(response);
+		BillingController.onRequestPurchaseResponse(itemId, response);
+	}
+
+	
 }
