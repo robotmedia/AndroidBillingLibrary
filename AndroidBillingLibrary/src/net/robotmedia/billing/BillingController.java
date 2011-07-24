@@ -1,17 +1,17 @@
 /*   Copyright 2011 Robot Media SL (http://www.robotmedia.net)
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 
 package net.robotmedia.billing;
 
@@ -30,6 +30,8 @@ import net.robotmedia.billing.model.TransactionManager;
 import net.robotmedia.billing.request.BillingRequest;
 import net.robotmedia.billing.request.ResponseCode;
 import net.robotmedia.billing.request.RestoreTransactions;
+import net.robotmedia.billing.security.DefaultSignatureValidator;
+import net.robotmedia.billing.security.ISignatureValidator;
 import net.robotmedia.billing.utils.Compatibility;
 import net.robotmedia.billing.utils.Security;
 
@@ -73,6 +75,7 @@ public class BillingController {
 	private static Set<String> automaticConfirmations = new HashSet<String>();
 	private static IConfiguration configuration = null;
 	private static boolean debug = false;
+	private static ISignatureValidator validator = null;
 
 	private static final String JSON_NONCE = "nonce";
 	private static final String JSON_ORDERS = "orders";
@@ -80,7 +83,9 @@ public class BillingController {
 
 	private static Set<IBillingObserver> observers = new HashSet<IBillingObserver>();
 
-	private static final String TAG = BillingController.class.getSimpleName();
+	public static final String LOG_TAG = "Billing";
+
+	private static HashMap<Long, BillingRequest> pendingRequests = new HashMap<Long, BillingRequest>();
 
 	/**
 	 * Adds the specified notification to the set of manual confirmations of the
@@ -215,7 +220,7 @@ public class BillingController {
 	private static byte[] getSalt() {
 		byte[] salt = null;
 		if (configuration == null || ((salt = configuration.getObfuscationSalt()) == null)) {
-			Log.w(TAG, "Can't (un)obfuscate purchases without salt");
+			Log.w(LOG_TAG, "Can't (un)obfuscate purchases without salt");
 		}
 		return salt;
 	}
@@ -377,22 +382,18 @@ public class BillingController {
 	 */
 	protected static void onPurchaseStateChanged(Context context, String signedData, String signature) {
 		if (TextUtils.isEmpty(signedData)) {
-			Log.w(TAG, "Signed data is empty");
+			Log.w(LOG_TAG, "Signed data is empty");
 			return;
 		}
 
 		if (!debug) {
 			if (TextUtils.isEmpty(signature)) {
-				Log.w(TAG, "Empty signature requires debug mode");
+				Log.w(LOG_TAG, "Empty signature requires debug mode");
 				return;
 			}
-			final String publicKey;
-			if (configuration == null || TextUtils.isEmpty(publicKey = configuration.getPublicKey())) {
-				Log.w(TAG, "Please set the public key or turn on debug mode");
-				return;
-			}
-			if (!Security.verify(signedData, signature, publicKey)) {
-				Log.w(TAG, "Signature does not match data.");
+			final ISignatureValidator validator = BillingController.validator != null ? BillingController.validator : new DefaultSignatureValidator(BillingController.configuration);
+			if (!validator.validate(signedData, signature)) {
+				Log.w(LOG_TAG, "Signature does not match data.");
 				return;
 			}
 		}
@@ -428,8 +429,6 @@ public class BillingController {
 		}
 	}
 
-	private static HashMap<Long, BillingRequest> pendingRequests = new HashMap<Long, BillingRequest>();
-	
 	/**
 	 * Called after a {@link net.robotmedia.billing.request.BillingRequest} is
 	 * sent.
@@ -441,7 +440,8 @@ public class BillingController {
 	 */
 	protected static void onRequestSent(long requestId, BillingRequest request) {
 		if (debug) {
-			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " of type " + request.getRequestType() + " sent");
+			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " of type "
+					+ request.getRequestType() + " sent");
 		}
 		if (request.isSuccess()) {
 			pendingRequests.put(requestId, request);
@@ -463,12 +463,23 @@ public class BillingController {
 	 */
 	protected static void onResponseCode(Context context, long requestId, int responseCode) {
 		if (debug) {
-			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " received response " + ResponseCode.valueOf(responseCode));
+			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " received response "
+					+ ResponseCode.valueOf(responseCode));
 		}
 		final BillingRequest request = pendingRequests.get(requestId);
 		if (request != null) {
 			pendingRequests.remove(requestId);
 			request.onResponseCode(responseCode);
+		}
+	}
+
+	/**
+	 * 
+	 * @param restoreTransactions
+	 */
+	public static void onTransactionsRestored(RestoreTransactions restoreTransactions) {
+		for (IBillingObserver o : observers) {
+			o.onTransactionsRestored();
 		}
 	}
 
@@ -573,6 +584,17 @@ public class BillingController {
 	}
 
 	/**
+	 * Sets a custom signature validator. If no custom signature validator is
+	 * provided, {@link net.robotmedia.billing.signature.DefaultSignatureValidator} will be used.
+	 * 
+	 * @param validator
+	 *            signature validator instance.
+	 */
+	public static void setSignatureValidator(ISignatureValidator validator) {
+		BillingController.validator = validator;
+	}
+
+	/**
 	 * Starts the specified purchase intent with the specified activity.
 	 * 
 	 * @param activity
@@ -592,7 +614,7 @@ public class BillingController {
 			try {
 				purchaseIntent.send(activity, 0 /* code */, intent);
 			} catch (CanceledException e) {
-				Log.e(TAG, "Error starting purchase intent", e);
+				Log.e(LOG_TAG, "Error starting purchase intent", e);
 			}
 		}
 	}
@@ -647,16 +669,6 @@ public class BillingController {
 		} else {
 			return false;
 		}
-	}
-
-	/**
-	 * 
-	 * @param restoreTransactions
-	 */
-	public static void onTransactionsRestored(RestoreTransactions restoreTransactions) {
-		for (IBillingObserver o : observers) {
-			o.onTransactionsRestored();
-		}		
 	}
 
 }
