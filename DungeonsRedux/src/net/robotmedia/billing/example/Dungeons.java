@@ -3,10 +3,6 @@ package net.robotmedia.billing.example;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.robotmedia.billing.BillingController;
-import net.robotmedia.billing.IBillingObserver;
 import net.robotmedia.billing.example.R;
 import net.robotmedia.billing.example.aux.CatalogAdapter;
 import net.robotmedia.billing.example.aux.CatalogEntry;
+import net.robotmedia.billing.helper.AbstractBillingObserver;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
 import net.robotmedia.billing.request.ResponseCode;
@@ -35,16 +31,10 @@ import net.robotmedia.billing.request.ResponseCode;
  * A sample application based on the original Dungeons to demonstrate how to use
  * BillingController and implement IBillingObserver.
  */
-public class Dungeons extends Activity implements IBillingObserver {
+public class Dungeons extends Activity {
 
 	private static final String TAG = "Dungeons";
 
-	/**
-	 * The SharedPreferences key for recording whether we initialized the
-	 * database. If false, then we perform a RestoreTransactions request to get
-	 * all the purchases for this user.
-	 */
-	private static final String KEY_TRANSACTIONS_RESTORED = "transactionsRestored";
 	private Button mBuyButton;
 	private Spinner mSelectItemSpinner;
 	private ListView mOwnedItemsTable;
@@ -55,6 +45,8 @@ public class Dungeons extends Activity implements IBillingObserver {
 
 	private CatalogAdapter mCatalogAdapter;
 
+	private AbstractBillingObserver mBillingObserver;
+
 	private Dialog createDialog(int titleId, int messageId) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(titleId).setIcon(android.R.drawable.stat_sys_warning).setMessage(messageId).setCancelable(
@@ -62,21 +54,6 @@ public class Dungeons extends Activity implements IBillingObserver {
 		return builder.create();
 	}
 
-	private void updateOwnedItems() {
-		List<Transaction> transactions = BillingController.getTransactions(this);
-		final ArrayList<String> ownedItems = new ArrayList<String>();
-		for (Transaction t : transactions) {
-			if (t.purchaseState == PurchaseState.PURCHASED) {
-				ownedItems.add(t.productId);
-			}
-		}
-		
-		mCatalogAdapter.setOwnedItems(ownedItems);
-		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_row, R.id.item_name, ownedItems);
-		mOwnedItemsTable.setAdapter(adapter);
-	}
-
-	@Override
 	public void onBillingChecked(boolean supported) {
 		if (supported) {
 			restoreTransactions();
@@ -89,10 +66,28 @@ public class Dungeons extends Activity implements IBillingObserver {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mBillingObserver = new AbstractBillingObserver(this) {
+
+			@Override
+			public void onBillingChecked(boolean supported) {
+				Dungeons.this.onBillingChecked(supported);
+			}
+
+			@Override
+			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
+				Dungeons.this.onPurchaseStateChanged(itemId, state);
+			}
+
+			@Override
+			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
+				Dungeons.this.onRequestPurchaseResponse(itemId, response);
+			}
+		};
+		
 		setContentView(R.layout.main);
 
 		setupWidgets();
-		BillingController.registerObserver(this);
+		BillingController.registerObserver(mBillingObserver);
 		BillingController.checkBillingSupported(this);
 		updateOwnedItems();
 	}
@@ -108,53 +103,27 @@ public class Dungeons extends Activity implements IBillingObserver {
 	}
 
 	@Override
-	public void onPurchaseCancelled(String itemId) {
-		Log.i(TAG, "onPurchaseCancelled() itemId: " + itemId);
-	}
-
-	@Override
-	public void onPurchaseExecuted(String itemId) {
-		Log.i(TAG, "onPurchaseExecuted() itemId: " + itemId);
-		updateOwnedItems();
-	}
-
-	@Override
-	public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {
-		BillingController.startPurchaseIntent(this, purchaseIntent, new Intent());
-	}
-
-	@Override
-	public void onPurchaseRefunded(String itemId) {
-		Log.i(TAG, "onPurchaseRefunded() itemId: " + itemId);
-	}
-
-	@Override
 	protected void onDestroy() {
-		BillingController.unregisterObserver(this);
+		BillingController.unregisterObserver(mBillingObserver);
 		super.onDestroy();
 	}
 
-	@Override
-	public void onTransactionsRestored() {
-		Log.d(TAG, "completed RestoreTransactions request");
-		// Update the shared preferences so that we don't perform
-		// a restore transactions again.
-		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-		SharedPreferences.Editor edit = prefs.edit();
-		edit.putBoolean(KEY_TRANSACTIONS_RESTORED, true);
-		edit.commit();
+	public void onPurchaseStateChanged(String itemId, PurchaseState state) {
+		Log.i(TAG, "onPurchaseStateChanged() itemId: " + itemId);
+		updateOwnedItems();
+	}
+
+	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
 	}
 
 	/**
-	 * Restores previous transactions, if any. This
-	 * happens if the application has just been installed or the user wiped
-	 * data. We do not want to do this on every startup, rather, we want to do
-	 * only when the database needs to be initialized.
+	 * Restores previous transactions, if any. This happens if the application
+	 * has just been installed or the user wiped data. We do not want to do this
+	 * on every startup, rather, we want to do only when the database needs to
+	 * be initialized.
 	 */
 	private void restoreTransactions() {
-		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-		boolean initialized = prefs.getBoolean(KEY_TRANSACTIONS_RESTORED, false);
-		if (!initialized) {
+		if (!mBillingObserver.isTransactionsRestored()) {
 			BillingController.restoreTransactions(this);
 			Toast.makeText(this, R.string.restoring_transactions, Toast.LENGTH_LONG).show();
 		}
@@ -167,7 +136,7 @@ public class Dungeons extends Activity implements IBillingObserver {
 
 			@Override
 			public void onClick(View v) {
-				BillingController.requestPurchase(Dungeons.this, mSku, true /*confirm*/);
+				BillingController.requestPurchase(Dungeons.this, mSku, true /* confirm */);
 			}
 		});
 
@@ -188,6 +157,18 @@ public class Dungeons extends Activity implements IBillingObserver {
 		mOwnedItemsTable = (ListView) findViewById(R.id.owned_items);
 	}
 
-	@Override
-	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {}
+	private void updateOwnedItems() {
+		List<Transaction> transactions = BillingController.getTransactions(this);
+		final ArrayList<String> ownedItems = new ArrayList<String>();
+		for (Transaction t : transactions) {
+			if (t.purchaseState == PurchaseState.PURCHASED) {
+				ownedItems.add(t.productId);
+			}
+		}
+
+		mCatalogAdapter.setOwnedItems(ownedItems);
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_row, R.id.item_name,
+				ownedItems);
+		mOwnedItemsTable.setAdapter(adapter);
+	}
 }

@@ -95,7 +95,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 [1]: http://developer.android.com/guide/market/billing/index.html
-[2]: https://github.com/robotmedia/AndroidBillingLibrary/blob/master/AndroidBillingLibrary/src/net/robotmedia/billing/AbstractBillingActivity.java
+[2]: https://github.com/robotmedia/AndroidBillingLibrary/blob/master/AndroidBillingLibrary/src/net/robotmedia/billing/helper/AbstractBillingActivity.java
 [3]: https://github.com/robotmedia/AndroidBillingLibrary/blob/master/AndroidBillingLibrary/src/net/robotmedia/billing/BillingController.java
 [4]: https://github.com/robotmedia/AndroidBillingLibrary/blob/master/AndroidBillingLibrary/src/net/robotmedia/billing/IBillingObserver.java
 [5]: https://github.com/robotmedia/AndroidBillingLibrary/tree/master/DungeonsRedux
