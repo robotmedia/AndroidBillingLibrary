@@ -36,7 +36,9 @@ public class BillingReceiver extends BroadcastReceiver {
     
 	@Override
     public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
+        final String action = intent.getAction();
+        BillingController.debug("Received " + action);
+        
         if (ACTION_PURCHASE_STATE_CHANGED.equals(action)) {
             purchaseStateChanged(context, intent);
         } else if (ACTION_NOTIFY.equals(action)) {

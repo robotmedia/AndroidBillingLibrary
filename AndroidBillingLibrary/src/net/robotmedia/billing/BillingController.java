@@ -195,6 +195,12 @@ public class BillingController {
 		return count;
 	}
 
+	protected static void debug(String message) {
+		if (debug) {
+			Log.d(LOG_TAG, message);
+		}
+	}
+
 	/**
 	 * Requests purchase information for the specified notification. Immediately
 	 * followed by a call to
@@ -349,6 +355,8 @@ public class BillingController {
 	 *            notification id.
 	 */
 	protected static void onNotify(Context context, String notifyId) {
+		debug("Notification " + notifyId + " available");
+
 		getPurchaseInformation(context, notifyId);
 	}
 
@@ -381,6 +389,8 @@ public class BillingController {
 	 *            data signature.
 	 */
 	protected static void onPurchaseStateChanged(Context context, String signedData, String signature) {
+		debug("Purchase state changed");
+
 		if (TextUtils.isEmpty(signedData)) {
 			Log.w(LOG_TAG, "Signed data is empty");
 			return;
@@ -391,7 +401,8 @@ public class BillingController {
 				Log.w(LOG_TAG, "Empty signature requires debug mode");
 				return;
 			}
-			final ISignatureValidator validator = BillingController.validator != null ? BillingController.validator : new DefaultSignatureValidator(BillingController.configuration);
+			final ISignatureValidator validator = BillingController.validator != null ? BillingController.validator
+					: new DefaultSignatureValidator(BillingController.configuration);
 			if (!validator.validate(signedData, signature)) {
 				Log.w(LOG_TAG, "Signature does not match data.");
 				return;
@@ -402,12 +413,12 @@ public class BillingController {
 		try {
 			JSONObject jObject = new JSONObject(signedData);
 			if (!verifyNonce(jObject)) {
-				Log.w(BillingController.class.getSimpleName(), "Invalid nonce");
+				Log.w(LOG_TAG, "Invalid nonce");
 				return;
 			}
 			purchases = parsePurchases(jObject);
 		} catch (JSONException e) {
-			Log.e(BillingController.class.getSimpleName(), "JSON exception: ", e);
+			Log.e(LOG_TAG, "JSON exception: ", e);
 			return;
 		}
 
@@ -439,10 +450,8 @@ public class BillingController {
 	 *            the billing request.
 	 */
 	protected static void onRequestSent(long requestId, BillingRequest request) {
-		if (debug) {
-			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " of type "
-					+ request.getRequestType() + " sent");
-		}
+		debug("Request " + requestId + " of type " + request.getRequestType() + " sent");
+
 		if (request.isSuccess()) {
 			pendingRequests.put(requestId, request);
 		} else if (request.hasNonce()) {
@@ -462,10 +471,8 @@ public class BillingController {
 	 * @see net.robotmedia.billing.request.ResponseCode
 	 */
 	protected static void onResponseCode(Context context, long requestId, int responseCode) {
-		if (debug) {
-			Log.d(BillingController.class.getSimpleName(), "Request " + requestId + " received response "
-					+ ResponseCode.valueOf(responseCode));
-		}
+		debug("Request " + requestId + " received response " + ResponseCode.valueOf(responseCode));
+
 		final BillingRequest request = pendingRequests.get(requestId);
 		if (request != null) {
 			pendingRequests.remove(requestId);
@@ -585,7 +592,9 @@ public class BillingController {
 
 	/**
 	 * Sets a custom signature validator. If no custom signature validator is
-	 * provided, {@link net.robotmedia.billing.signature.DefaultSignatureValidator} will be used.
+	 * provided,
+	 * {@link net.robotmedia.billing.signature.DefaultSignatureValidator} will
+	 * be used.
 	 * 
 	 * @param validator
 	 *            signature validator instance.
