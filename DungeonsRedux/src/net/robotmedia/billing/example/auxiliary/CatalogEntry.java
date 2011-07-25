@@ -1,4 +1,4 @@
-package net.robotmedia.billing.example.aux;
+package net.robotmedia.billing.example.auxiliary;
 
 import net.robotmedia.billing.example.R;
 
