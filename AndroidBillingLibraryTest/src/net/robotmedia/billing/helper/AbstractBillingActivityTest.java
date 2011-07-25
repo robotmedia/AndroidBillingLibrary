@@ -13,7 +13,7 @@
 *   limitations under the License.
 */
 
-package net.robotmedia.billing;
+package net.robotmedia.billing.helper;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.MediumTest;

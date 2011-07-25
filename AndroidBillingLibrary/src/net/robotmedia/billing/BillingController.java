@@ -105,9 +105,9 @@ public class BillingController {
 	}
 
 	/**
-	 * Returns the billing status. If it is currently unknown, requests to check
-	 * the billing status, in which case observers should eventually receive a
-	 * {@link IBillingObserver#onBillingChecked(boolean)} notification.
+	 * Returns the billing status. If it is currently unknown, checks the billing
+	 * status asynchronously, in which case observers will eventually receive
+	 * a {@link IBillingObserver#onBillingChecked(boolean)} notification.
 	 * 
 	 * @param context
 	 * @return the current billing status (unknown, supported or unsupported).

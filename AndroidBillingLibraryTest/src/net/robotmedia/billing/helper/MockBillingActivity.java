@@ -13,7 +13,7 @@
 *   limitations under the License.
 */
 
-package net.robotmedia.billing;
+package net.robotmedia.billing.helper;
 
 import net.robotmedia.billing.model.Transaction.PurchaseState;
 import net.robotmedia.billing.request.ResponseCode;
@@ -36,11 +36,6 @@ public class MockBillingActivity extends AbstractBillingActivity {
 	public String getPublicKey() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void onTransactionsRestored() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import android.app.PendingIntent;
 public interface IBillingObserver {
 
 	/**
-	 * Called after checking if in-app billing is supported or not.
+	 * Called only once after determining if in-app billing is supported or not.
 	 * 
 	 * @param supported
 	 *            if true, in-app billing is supported. Otherwise, it isn't.
@@ -65,7 +65,7 @@ public interface IBillingObserver {
 	public void onRequestPurchaseResponse(String itemId, ResponseCode response);
 
 	/**
-	 * Called after a restore transactions request has been successfully
+	 * Called when a restore transactions request has been successfully
 	 * received by the server.
 	 */
 	public void onTransactionsRestored();

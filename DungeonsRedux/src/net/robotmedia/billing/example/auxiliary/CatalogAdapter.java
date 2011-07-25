@@ -3,7 +3,7 @@ package net.robotmedia.billing.example.auxiliary;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.robotmedia.billing.example.aux.CatalogEntry.Managed;
+import net.robotmedia.billing.example.auxiliary.CatalogEntry.Managed;
 
 import android.content.Context;
 import android.view.View;
