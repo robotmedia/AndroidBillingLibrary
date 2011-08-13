@@ -21,6 +21,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class BillingDB {
     static final String DATABASE_NAME = "billing.db";
@@ -59,6 +60,10 @@ public class BillingDB {
         values.put(COLUMN_DEVELOPER_PAYLOAD, transaction.developerPayload);
         mDb.replace(TABLE_TRANSACTIONS, null /* nullColumnHack */, values);
     }
+    
+    public void remove(Transaction transaction) {
+		mDb.delete(TABLE_TRANSACTIONS, COLUMN__ID + "=?", new String[] { transaction.orderId });
+	}
     
     public Cursor queryTransactions() {
         return mDb.query(TABLE_TRANSACTIONS, TABLE_TRANSACTIONS_COLUMNS, null,
