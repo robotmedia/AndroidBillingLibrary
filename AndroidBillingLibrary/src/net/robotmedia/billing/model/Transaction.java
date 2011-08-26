@@ -123,6 +123,9 @@ public class Transaction {
 		return true;
 	}
 	
-
+	@Override
+	public String toString() {
+		return String.valueOf(orderId);
+	}
     
 }
