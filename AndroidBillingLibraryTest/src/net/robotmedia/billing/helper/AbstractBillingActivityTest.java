@@ -20,7 +20,7 @@ import android.test.suitebuilder.annotation.MediumTest;
 
 public class AbstractBillingActivityTest extends ActivityInstrumentationTestCase2<MockBillingActivity> {
 
-	private static final String PURCHASE_ID = "android.example.purchased";
+//	private static final String PURCHASE_ID = "android.example.purchased";
 
 	private MockBillingActivity mActivity;
 
@@ -46,11 +46,10 @@ public class AbstractBillingActivityTest extends ActivityInstrumentationTestCase
 	// 0, new Intent(), 0);
 	// mActivity.onPurchaseIntent(PURCHASE_ID, purchaseIntent);
 	// }
-
-	@MediumTest
-	public void testRequestPurchase() throws Exception {
-		mActivity.requestPurchase(PURCHASE_ID);
-	}
+//	@MediumTest
+//	public void testRequestPurchase() throws Exception {
+//		mActivity.requestPurchase(PURCHASE_ID);
+//	}
 
 	@MediumTest
 	public void testRestoreTransactions() throws Exception {

@@ -27,8 +27,6 @@ import org.json.JSONObject;
 
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionManager;
-import net.robotmedia.billing.request.BillingRequest;
-import net.robotmedia.billing.request.ResponseCode;
 import net.robotmedia.billing.security.DefaultSignatureValidator;
 import net.robotmedia.billing.security.ISignatureValidator;
 import net.robotmedia.billing.utils.Compatibility;
@@ -288,7 +286,7 @@ public class BillingController {
 	 * 
 	 * @param supported
 	 */
-	public static void onBillingChecked(boolean supported) {
+	protected static void onBillingChecked(boolean supported) {
 		status = supported ? BillingStatus.SUPPORTED : BillingStatus.UNSUPPORTED;
 		for (IBillingObserver o : observers) {
 			o.onBillingChecked(supported);
@@ -318,7 +316,7 @@ public class BillingController {
 	 * @param purchaseIntent
 	 *            intent to purchase the item.
 	 */
-	public static void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {
+	protected static void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {
 		for (IBillingObserver o : observers) {
 			o.onPurchaseIntent(itemId, purchaseIntent);
 		}
@@ -389,7 +387,7 @@ public class BillingController {
 	}
 
 	/**
-	 * Called after a {@link net.robotmedia.billing.request.BillingRequest} is
+	 * Called after a {@link net.robotmedia.billing.BillingRequest} is
 	 * sent.
 	 * 
 	 * @param requestId
@@ -408,7 +406,7 @@ public class BillingController {
 	}
 
 	/**
-	 * Called after a {@link net.robotmedia.billing.request.BillingRequest} is
+	 * Called after a {@link net.robotmedia.billing.BillingRequest} is
 	 * sent.
 	 * 
 	 * @param context
@@ -419,7 +417,7 @@ public class BillingController {
 	 * @see net.robotmedia.billing.request.ResponseCode
 	 */
 	protected static void onResponseCode(Context context, long requestId, int responseCode) {
-		final ResponseCode response = ResponseCode.valueOf(responseCode);
+		final BillingRequest.ResponseCode response = BillingRequest.ResponseCode.valueOf(responseCode);
 		debug("Request " + requestId + " received response " + response);
 
 		final BillingRequest request = pendingRequests.get(requestId);
@@ -429,7 +427,7 @@ public class BillingController {
 		}
 	}
 
-	public static void onTransactionsRestored() {
+	protected static void onTransactionsRestored() {
 		for (IBillingObserver o : observers) {
 			o.onTransactionsRestored();
 		}
@@ -625,7 +623,7 @@ public class BillingController {
 		}
 	}
 
-	public static void onRequestPurchaseResponse(String itemId, ResponseCode response) {
+	protected static void onRequestPurchaseResponse(String itemId, BillingRequest.ResponseCode response) {
 		for (IBillingObserver o : observers) {
 			o.onRequestPurchaseResponse(itemId, response);
 		}

@@ -3,7 +3,7 @@
       package="net.robotmedia.billing"
       android:versionCode="1"
       android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="4" />
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="13"/>
     <!-- Add this permission to your manifest -->
     <uses-permission android:name="com.android.vending.BILLING" />
     <application>

@@ -15,7 +15,7 @@
 
 package net.robotmedia.billing.model.request;
 
-import net.robotmedia.billing.request.ResponseCode;
+import net.robotmedia.billing.BillingRequest.ResponseCode;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 

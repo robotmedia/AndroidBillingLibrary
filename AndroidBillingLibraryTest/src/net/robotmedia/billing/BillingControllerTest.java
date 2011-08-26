@@ -19,12 +19,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.model.BillingDB;
 import net.robotmedia.billing.model.BillingDBTest;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionTest;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
-import net.robotmedia.billing.request.ResponseCode;
 import android.app.PendingIntent;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;

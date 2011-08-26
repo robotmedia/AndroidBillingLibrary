@@ -17,12 +17,6 @@ package net.robotmedia.billing;
 
 import java.util.LinkedList;
 
-import net.robotmedia.billing.request.CheckBillingSupported;
-import net.robotmedia.billing.request.ConfirmNotifications;
-import net.robotmedia.billing.request.GetPurchaseInformation;
-import net.robotmedia.billing.request.RequestPurchase;
-import net.robotmedia.billing.request.RestoreTransactions;
-import net.robotmedia.billing.request.BillingRequest;
 import net.robotmedia.billing.utils.Compatibility;
 
 import com.android.vending.billing.IMarketBillingService;
@@ -108,14 +102,14 @@ public class BillingService extends Service implements ServiceConnection {
 
 	private void checkBillingSupported() {
 		final String packageName = getPackageName();
-		final CheckBillingSupported request = new CheckBillingSupported(packageName);
+		final BillingRequest.CheckBillingSupported request = new BillingRequest.CheckBillingSupported(packageName);
 		runRequestOrQueue(request);
 	}
 
 	private void confirmNotifications(Intent intent) {
 		final String packageName = getPackageName();
 		final String[] notifyIds = intent.getStringArrayExtra(EXTRA_NOTIFY_IDS);
-		final ConfirmNotifications request = new ConfirmNotifications(packageName, notifyIds);
+		final BillingRequest.ConfirmNotifications request = new BillingRequest.ConfirmNotifications(packageName, notifyIds);
 		runRequestOrQueue(request);
 	}
 
@@ -135,7 +129,7 @@ public class BillingService extends Service implements ServiceConnection {
 		final String packageName = getPackageName();
 		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
 		final String[] notifyIds = intent.getStringArrayExtra(EXTRA_NOTIFY_IDS);
-		final GetPurchaseInformation request = new GetPurchaseInformation(packageName, notifyIds);
+		final BillingRequest.GetPurchaseInformation request = new BillingRequest.GetPurchaseInformation(packageName, notifyIds);
 		request.setNonce(nonce);
 		runRequestOrQueue(request);
 	}
@@ -197,14 +191,14 @@ public class BillingService extends Service implements ServiceConnection {
 		final String packageName = getPackageName();
 		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
 		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
-		final RequestPurchase request = new RequestPurchase(packageName, itemId, developerPayload);
+		final BillingRequest.RequestPurchase request = new BillingRequest.RequestPurchase(packageName, itemId, developerPayload);
 		runRequestOrQueue(request);
 	}
 
 	private void restoreTransactions(Intent intent) {
 		final String packageName = getPackageName();
 		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
-		final RestoreTransactions request = new RestoreTransactions(packageName);
+		final BillingRequest.RestoreTransactions request = new BillingRequest.RestoreTransactions(packageName);
 		request.setNonce(nonce);
 		runRequestOrQueue(request);
 	}

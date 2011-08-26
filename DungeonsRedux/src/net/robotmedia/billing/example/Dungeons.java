@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.robotmedia.billing.BillingController;
+import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.example.R;
 import net.robotmedia.billing.example.auxiliary.CatalogAdapter;
 import net.robotmedia.billing.example.auxiliary.CatalogEntry;
 import net.robotmedia.billing.helper.AbstractBillingObserver;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
-import net.robotmedia.billing.request.ResponseCode;
 
 /**
  * A sample application based on the original Dungeons to demonstrate how to use
