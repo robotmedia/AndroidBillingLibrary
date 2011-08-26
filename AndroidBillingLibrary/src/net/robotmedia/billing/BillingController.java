@@ -165,35 +165,7 @@ public class BillingController {
 		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
 		return TransactionManager.countPurchases(context, itemId);
 	}
-
-	/**
-	 * Returns the number of purchases for the specified item, minus the number
-	 * of cancellations and refunds.
-	 * 
-	 * @param context
-	 * @param itemId
-	 *            id of the item whose purchases will be counted.
-	 * @return number of net purchases for the specified item.
-	 */
-	public static int countPurchasesNet(Context context, String itemId) {
-		final List<Transaction> transactions = BillingController.getTransactions(context, itemId);
-		int count = 0;
-		for (Transaction t : transactions) {
-			switch (t.purchaseState) {
-			case PURCHASED:
-				count++;
-				break;
-			case CANCELLED:
-				count--;
-				break;
-			case REFUNDED:
-				count--;
-				break;
-			}
-		}
-		return count;
-	}
-
+	
 	protected static void debug(String message) {
 		if (debug) {
 			Log.d(LOG_TAG, message);
@@ -274,19 +246,6 @@ public class BillingController {
 		final byte[] salt = getSalt();
 		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
 		return TransactionManager.isPurchased(context, itemId);
-	}
-
-	/**
-	 * Returns true if there have been purchases for the specified item and the
-	 * number is greater than the number of cancellations and refunds.
-	 * 
-	 * @param context
-	 * @param itemId
-	 *            item id
-	 * @return true if there are net purchases for the item, false otherwise.
-	 */
-	public static boolean isPurchasedNet(Context context, String itemId) {
-		return countPurchasesNet(context, itemId) > 0;
 	}
 
 	/**

@@ -56,17 +56,6 @@ public class BillingControllerTest extends AndroidTestCase {
 	}
 	
 	@MediumTest
-	public void testIsPurchasedNet() throws Exception {
-		assertFalse(BillingController.isPurchasedNet(getContext(), TransactionTest.TRANSACTION_1.productId));
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1);
-		assertTrue(BillingController.isPurchasedNet(getContext(), TransactionTest.TRANSACTION_1.productId));
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1_REFUNDED);
-		assertFalse(BillingController.isPurchasedNet(getContext(), TransactionTest.TRANSACTION_1.productId));
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
-		assertFalse(BillingController.isPurchasedNet(getContext(), TransactionTest.TRANSACTION_1.productId));
-	}
-	
-	@MediumTest
 	public void testCountPurchases() throws Exception {
 		assertEquals(BillingController.countPurchases(getContext(), TransactionTest.TRANSACTION_1.productId), 0);
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1);
@@ -75,17 +64,6 @@ public class BillingControllerTest extends AndroidTestCase {
 		assertEquals(BillingController.countPurchases(getContext(), TransactionTest.TRANSACTION_1.productId), 1);
 		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
 		assertEquals(BillingController.countPurchases(getContext(), TransactionTest.TRANSACTION_1.productId), 1);
-	}
-	
-	@MediumTest
-	public void testCountPurchasesNet() throws Exception {
-		assertEquals(BillingController.countPurchasesNet(getContext(), TransactionTest.TRANSACTION_1.productId), 0);
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1);
-		assertEquals(BillingController.countPurchasesNet(getContext(), TransactionTest.TRANSACTION_1.productId), 1);
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_1_REFUNDED);
-		assertEquals(BillingController.countPurchasesNet(getContext(), TransactionTest.TRANSACTION_1.productId), 0);
-		BillingController.storeTransaction(getContext(), TransactionTest.TRANSACTION_2);
-		assertEquals(BillingController.countPurchasesNet(getContext(), TransactionTest.TRANSACTION_1.productId), 0);
 	}
 	
 	@MediumTest
