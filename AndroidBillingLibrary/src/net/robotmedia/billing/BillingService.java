@@ -17,6 +17,8 @@ package net.robotmedia.billing;
 
 import java.util.LinkedList;
 
+import static net.robotmedia.billing.BillingRequest.*;
+
 import net.robotmedia.billing.utils.Compatibility;
 
 import com.android.vending.billing.IMarketBillingService;
@@ -100,16 +102,16 @@ public class BillingService extends Service implements ServiceConnection {
 		}
 	}
 
-	private void checkBillingSupported() {
+	private void checkBillingSupported(int startId) {
 		final String packageName = getPackageName();
-		final BillingRequest.CheckBillingSupported request = new BillingRequest.CheckBillingSupported(packageName);
+		final CheckBillingSupported request = new CheckBillingSupported(packageName,startId);
 		runRequestOrQueue(request);
 	}
 
-	private void confirmNotifications(Intent intent) {
+	private void confirmNotifications(Intent intent,int startId) {
 		final String packageName = getPackageName();
 		final String[] notifyIds = intent.getStringArrayExtra(EXTRA_NOTIFY_IDS);
-		final BillingRequest.ConfirmNotifications request = new BillingRequest.ConfirmNotifications(packageName, notifyIds);
+		final ConfirmNotifications request = new ConfirmNotifications(packageName,startId, notifyIds);
 		runRequestOrQueue(request);
 	}
 
@@ -125,11 +127,11 @@ public class BillingService extends Service implements ServiceConnection {
 		return Action.valueOf(split[split.length - 1]);
 	}
 
-	private void getPurchaseInformation(Intent intent) {
+	private void getPurchaseInformation(Intent intent,int startId) {
 		final String packageName = getPackageName();
 		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
 		final String[] notifyIds = intent.getStringArrayExtra(EXTRA_NOTIFY_IDS);
-		final BillingRequest.GetPurchaseInformation request = new BillingRequest.GetPurchaseInformation(packageName, notifyIds);
+		final GetPurchaseInformation request = new GetPurchaseInformation(packageName,startId, notifyIds);
 		request.setNonce(nonce);
 		runRequestOrQueue(request);
 	}
@@ -155,62 +157,68 @@ public class BillingService extends Service implements ServiceConnection {
 	// method will not be called.
 	@Override
 	public void onStart(Intent intent, int startId) {
-	    handleCommand(intent);
+	    handleCommand(intent,startId);
 	}
 
 	// @Override // Avoid compile errors on pre-2.0
 	public int onStartCommand(Intent intent, int flags, int startId) {
-	    handleCommand(intent);
+	    handleCommand(intent,startId);
 	    return Compatibility.START_NOT_STICKY;
 	}
 	
-	private void handleCommand(Intent intent) {
+	private void handleCommand(Intent intent,int startId) {
 		final Action action = getActionFromIntent(intent);
 		if (action == null) {
 			return;
 		}
 		switch (action) {			
 		case CHECK_BILLING_SUPPORTED:
-			checkBillingSupported();
+			checkBillingSupported(startId);
 			break;
 		case REQUEST_PURCHASE:
-			requestPurchase(intent);
+			requestPurchase(intent,startId);
 			break;
 		case GET_PURCHASE_INFORMATION:
-			getPurchaseInformation(intent);
+			getPurchaseInformation(intent,startId);
 			break;
 		case CONFIRM_NOTIFICATIONS:
-			confirmNotifications(intent);
+			confirmNotifications(intent,startId);
 			break;
 		case RESTORE_TRANSACTIONS:
-			restoreTransactions(intent);
+			restoreTransactions(intent,startId);
 		}
 	}
 
-	private void requestPurchase(Intent intent) {
+	private void requestPurchase(Intent intent,int startId) {
 		final String packageName = getPackageName();
 		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
 		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
-		final BillingRequest.RequestPurchase request = new BillingRequest.RequestPurchase(packageName, itemId, developerPayload);
+		final RequestPurchase request = new RequestPurchase(packageName,startId, itemId, developerPayload);
 		runRequestOrQueue(request);
 	}
 
-	private void restoreTransactions(Intent intent) {
+	private void restoreTransactions(Intent intent,int startId) {
 		final String packageName = getPackageName();
 		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
-		final BillingRequest.RestoreTransactions request = new BillingRequest.RestoreTransactions(packageName);
+		final RestoreTransactions request = new RestoreTransactions(packageName,startId);
 		request.setNonce(nonce);
 		runRequestOrQueue(request);
 	}
 
 	private void runPendingRequests() {
 		BillingRequest request;
+		int maxId=-1;		
 		while ((request = mPendingRequests.peek()) != null) {
 			if (mService != null) {
 				runRequest(request);
 				mPendingRequests.remove();
+				
+				if(maxId<request.getStartId())
+					maxId=request.getStartId();
 			}
 		}
+		if(maxId>=0)
+			stopSelf(maxId);
 	}
 
 	private void runRequest(BillingRequest request) {
@@ -224,12 +232,12 @@ public class BillingService extends Service implements ServiceConnection {
 	}
 
 	private void runRequestOrQueue(BillingRequest request) {
-		if (mService == null) {
-			mPendingRequests.add(request);
-			bindMarketBillingService();
-			return;
+		mPendingRequests.add(request);
+		if (mService == null) {			
+			bindMarketBillingService();		
+		} else {
+			runPendingRequests();
 		}
-		runRequest(request);
 	}
 
 }
