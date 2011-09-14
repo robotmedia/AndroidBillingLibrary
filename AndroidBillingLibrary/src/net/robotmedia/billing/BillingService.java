@@ -239,5 +239,18 @@ public class BillingService extends Service implements ServiceConnection {
 			runPendingRequests();
 		}
 	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		//Ensure not leaking android market billing service
+		if (mService != null) {
+			try {
+				unbindService(this);
+			} catch (IllegalArgumentException e) {
+				// This might happen if the service was disconnected
+			}
+		}
+	}
 
 }
