@@ -26,8 +26,8 @@ public abstract class BillingRequest {
 
 	public static class CheckBillingSupported extends BillingRequest {
 		
-    	public CheckBillingSupported(String packageName) {
-    		super(packageName);
+    	public CheckBillingSupported(String packageName,int startId) {
+    		super(packageName,startId);
     	}
 
     	@Override
@@ -48,8 +48,8 @@ public abstract class BillingRequest {
     	
     	private static final String KEY_NOTIFY_IDS = "NOTIFY_IDS";
     	
-    	public ConfirmNotifications(String packageName, String[] notifyIds) {
-    		super(packageName);
+    	public ConfirmNotifications(String packageName,int startId, String[] notifyIds) {
+    		super(packageName,startId);
     		this.notifyIds = notifyIds;
     	}
 
@@ -70,8 +70,8 @@ public abstract class BillingRequest {
     	
     	private static final String KEY_NOTIFY_IDS = "NOTIFY_IDS";
     	
-    	public GetPurchaseInformation(String packageName, String[] notifyIds) {
-    		super(packageName);
+    	public GetPurchaseInformation(String packageName,int startId, String[] notifyIds) {
+    		super(packageName,startId);
     		this.notifyIds = notifyIds;
     	}
     	
@@ -97,8 +97,8 @@ public abstract class BillingRequest {
     	private static final String KEY_DEVELOPER_PAYLOAD = "DEVELOPER_PAYLOAD";
     	private static final String KEY_PURCHASE_INTENT = "PURCHASE_INTENT";
     	
-    	public RequestPurchase(String packageName, String itemId, String developerPayload) {
-    		super(packageName);
+    	public RequestPurchase(String packageName, int startId,String itemId, String developerPayload) {
+    		super(packageName,startId);
     		this.itemId = itemId;
     		this.developerPayload = developerPayload;
     	}
@@ -154,8 +154,8 @@ public abstract class BillingRequest {
     }
 	public static class RestoreTransactions extends BillingRequest {
     	
-    	public RestoreTransactions(String packageName) {
-    		super(packageName);
+    	public RestoreTransactions(String packageName,int startId) {
+    		super(packageName,startId);
     	}
     	
     	@Override
@@ -187,10 +187,12 @@ public abstract class BillingRequest {
     public static final long IGNORE_REQUEST_ID = -1;
 	private String packageName;	
     
+	private int startId;
     private boolean success;
 	private long nonce;
-	public BillingRequest(String packageName) {
+	public BillingRequest(String packageName,int startId) {		
     	this.packageName = packageName;
+    	this.startId=startId;
     }
     
 	protected void addParams(Bundle request) {
@@ -253,6 +255,10 @@ public abstract class BillingRequest {
     		Log.w(this.getClass().getSimpleName(), "Error with response code " + ResponseCode.valueOf(responseCode));
     	}
     	return success;
+    }
+    
+    public int getStartId() {
+    	return startId;
     }
     
 }
