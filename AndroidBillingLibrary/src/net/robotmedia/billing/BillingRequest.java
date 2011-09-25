@@ -26,8 +26,8 @@ public abstract class BillingRequest {
 
 	public static class CheckBillingSupported extends BillingRequest {
 		
-    	public CheckBillingSupported(String packageName,int startId) {
-    		super(packageName,startId);
+    	public CheckBillingSupported(String packageName, int startId) {
+    		super(packageName, startId);
     	}
 
     	@Override
@@ -48,8 +48,8 @@ public abstract class BillingRequest {
     	
     	private static final String KEY_NOTIFY_IDS = "NOTIFY_IDS";
     	
-    	public ConfirmNotifications(String packageName,int startId, String[] notifyIds) {
-    		super(packageName,startId);
+    	public ConfirmNotifications(String packageName, int startId, String[] notifyIds) {
+    		super(packageName, startId);
     		this.notifyIds = notifyIds;
     	}
 
@@ -70,7 +70,7 @@ public abstract class BillingRequest {
     	
     	private static final String KEY_NOTIFY_IDS = "NOTIFY_IDS";
     	
-    	public GetPurchaseInformation(String packageName,int startId, String[] notifyIds) {
+    	public GetPurchaseInformation(String packageName, int startId, String[] notifyIds) {
     		super(packageName,startId);
     		this.notifyIds = notifyIds;
     	}
@@ -97,8 +97,8 @@ public abstract class BillingRequest {
     	private static final String KEY_DEVELOPER_PAYLOAD = "DEVELOPER_PAYLOAD";
     	private static final String KEY_PURCHASE_INTENT = "PURCHASE_INTENT";
     	
-    	public RequestPurchase(String packageName, int startId,String itemId, String developerPayload) {
-    		super(packageName,startId);
+    	public RequestPurchase(String packageName, int startId, String itemId, String developerPayload) {
+    		super(packageName, startId);
     		this.itemId = itemId;
     		this.developerPayload = developerPayload;
     	}
@@ -154,8 +154,8 @@ public abstract class BillingRequest {
     }
 	public static class RestoreTransactions extends BillingRequest {
     	
-    	public RestoreTransactions(String packageName,int startId) {
-    		super(packageName,startId);
+    	public RestoreTransactions(String packageName, int startId) {
+    		super(packageName, startId);
     	}
     	
     	@Override
