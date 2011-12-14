@@ -432,6 +432,12 @@ public class BillingController {
 			o.onTransactionsRestored();
 		}
 	}
+	
+	protected static void onTransactionsRestoreFailed() {
+		for (IBillingObserver o : observers) {
+			o.onTransactionsRestoreFailed();
+		}
+	}
 
 	/**
 	 * Parse all purchases from the JSON data received from the Market Billing

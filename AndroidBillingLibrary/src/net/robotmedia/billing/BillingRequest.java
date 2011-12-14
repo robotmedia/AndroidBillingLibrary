@@ -171,6 +171,9 @@ public abstract class BillingRequest {
     		if (response == ResponseCode.RESULT_OK) {
     			BillingController.onTransactionsRestored();
     		}
+    		else if (response == ResponseCode.RESULT_SERVICE_UNAVAILABLE) {
+    			BillingController.onTransactionsRestoreFailed();
+    		}
     	}
     	
     }

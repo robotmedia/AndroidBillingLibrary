@@ -230,7 +230,7 @@ public class BillingService extends Service implements ServiceConnection {
 			final long requestId = request.run(mService);
 			BillingController.onRequestSent(requestId, request);
 		} catch (RemoteException e) {
-			Log.w(this.getClass().getSimpleName(), "Remote billing service crashed");
+			Log.e(this.getClass().getSimpleName(), "Remote billing service crashed", e);
 			// TODO: Retry?
 		}
 	}
