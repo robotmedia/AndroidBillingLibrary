@@ -635,4 +635,10 @@ public class BillingController {
 		}
 	}
 
+	protected static void onServiceError() {
+		for (IBillingObserver o : observers) {
+			o.onServiceError();
+		}
+	}
+
 }

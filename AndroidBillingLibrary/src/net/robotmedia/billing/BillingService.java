@@ -231,7 +231,10 @@ public class BillingService extends Service implements ServiceConnection {
 			BillingController.onRequestSent(requestId, request);
 		} catch (RemoteException e) {
 			Log.e(this.getClass().getSimpleName(), "Remote billing service crashed", e);
-			// TODO: Retry?
+			
+			// Use this to make the app to bind market again
+			mService = null;
+			BillingController.onServiceError();
 		}
 	}
 
