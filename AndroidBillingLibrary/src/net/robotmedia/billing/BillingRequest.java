@@ -29,6 +29,12 @@ public abstract class BillingRequest {
     	public CheckBillingSupported(String packageName, int startId) {
     		super(packageName, startId);
     	}
+    	
+        protected boolean validateResponse(Bundle response) {
+        	final int responseCode = response.getInt(KEY_RESPONSE_CODE);
+        	
+        	return ResponseCode.isResponseOk(responseCode) || ResponseCode.valueOf(responseCode) == ResponseCode.RESULT_BILLING_UNAVAILABLE;
+        }
 
     	@Override
     	public String getRequestType() {
@@ -37,7 +43,8 @@ public abstract class BillingRequest {
 
     	@Override
     	protected void processOkResponse(Bundle response) {
-    		final boolean supported = this.isSuccess();
+    		final int responseCode = response.getInt(KEY_RESPONSE_CODE);
+    		final boolean supported = ResponseCode.isResponseOk(responseCode);
     		BillingController.onBillingChecked(supported);
     	}
     	
@@ -171,7 +178,7 @@ public abstract class BillingRequest {
     		if (response == ResponseCode.RESULT_OK) {
     			BillingController.onTransactionsRestored();
     		}
-    		else if (response == ResponseCode.RESULT_SERVICE_UNAVAILABLE) {
+    		else {
     			BillingController.onTransactionsRestoreFailed();
     		}
     	}
@@ -240,9 +247,11 @@ public abstract class BillingRequest {
         addParams(request);
         final Bundle response = mService.sendBillingRequest(request);
         if (validateResponse(response)) {
+        	success = true;
         	processOkResponse(response);
         	return response.getLong(KEY_REQUEST_ID, IGNORE_REQUEST_ID);
         } else {
+        	success = false;
         	return IGNORE_REQUEST_ID;
         }
 	}
@@ -253,11 +262,14 @@ public abstract class BillingRequest {
     
     protected boolean validateResponse(Bundle response) {
     	final int responseCode = response.getInt(KEY_RESPONSE_CODE);
-    	success = ResponseCode.isResponseOk(responseCode);
-    	if (!success) {
-    		Log.w(this.getClass().getSimpleName(), "Error with response code " + ResponseCode.valueOf(responseCode));
+    	
+    	if (ResponseCode.isResponseOk(responseCode)) {
+    		return true;
     	}
-    	return success;
+    	else {
+    		Log.w(this.getClass().getSimpleName(), "Error with response code " + ResponseCode.valueOf(responseCode));
+    		return false;
+    	}
     }
     
     public int getStartId() {
