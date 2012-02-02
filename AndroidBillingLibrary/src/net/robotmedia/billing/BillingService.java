@@ -1,17 +1,17 @@
 /*   Copyright 2011 Robot Media SL (http://www.robotmedia.net)
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 
 package net.robotmedia.billing;
 
@@ -49,12 +49,14 @@ public class BillingService extends Service implements ServiceConnection {
 	private static IMarketBillingService mService;
 
 	public static void checkBillingSupported(Context context) {
-		final Intent intent = createIntent(context, Action.CHECK_BILLING_SUPPORTED);
+		final Intent intent = createIntent(context,
+				Action.CHECK_BILLING_SUPPORTED);
 		context.startService(intent);
 	}
 
 	public static void confirmNotifications(Context context, String[] notifyIds) {
-		final Intent intent = createIntent(context, Action.CONFIRM_NOTIFICATIONS);
+		final Intent intent = createIntent(context,
+				Action.CONFIRM_NOTIFICATIONS);
 		intent.putExtra(EXTRA_NOTIFY_IDS, notifyIds);
 		context.startService(intent);
 	}
@@ -66,18 +68,22 @@ public class BillingService extends Service implements ServiceConnection {
 		return intent;
 	}
 
-	private static final String getActionForIntent(Context context, Action action) {
+	private static final String getActionForIntent(Context context,
+			Action action) {
 		return context.getPackageName() + "." + action.toString();
 	}
 
-	public static void getPurchaseInformation(Context context, String[] notifyIds, long nonce) {
-		final Intent intent = createIntent(context, Action.GET_PURCHASE_INFORMATION);
+	public static void getPurchaseInformation(Context context,
+			String[] notifyIds, long nonce) {
+		final Intent intent = createIntent(context,
+				Action.GET_PURCHASE_INFORMATION);
 		intent.putExtra(EXTRA_NOTIFY_IDS, notifyIds);
 		intent.putExtra(EXTRA_NONCE, nonce);
 		context.startService(intent);
 	}
 
-	public static void requestPurchase(Context context, String itemId, String developerPayload) {
+	public static void requestPurchase(Context context, String itemId,
+			String developerPayload) {
 		final Intent intent = createIntent(context, Action.REQUEST_PURCHASE);
 		intent.putExtra(EXTRA_ITEM_ID, itemId);
 		intent.putExtra(EXTRA_DEVELOPER_PAYLOAD, developerPayload);
@@ -93,25 +99,31 @@ public class BillingService extends Service implements ServiceConnection {
 
 	private void bindMarketBillingService() {
 		try {
-			final boolean bindResult = bindService(new Intent(ACTION_MARKET_BILLING_SERVICE), this, Context.BIND_AUTO_CREATE);
+			final boolean bindResult = bindService(new Intent(
+					ACTION_MARKET_BILLING_SERVICE), this,
+					Context.BIND_AUTO_CREATE);
 			if (!bindResult) {
-				Log.e(this.getClass().getSimpleName(), "Could not bind to MarketBillingService");
+				Log.e(this.getClass().getSimpleName(),
+						"Could not bind to MarketBillingService");
 			}
 		} catch (SecurityException e) {
-			Log.e(this.getClass().getSimpleName(), "Could not bind to MarketBillingService", e);
+			Log.e(this.getClass().getSimpleName(),
+					"Could not bind to MarketBillingService", e);
 		}
 	}
 
 	private void checkBillingSupported(int startId) {
 		final String packageName = getPackageName();
-		final CheckBillingSupported request = new CheckBillingSupported(packageName, startId);
+		final CheckBillingSupported request = new CheckBillingSupported(
+				packageName, startId);
 		runRequestOrQueue(request);
 	}
 
 	private void confirmNotifications(Intent intent, int startId) {
 		final String packageName = getPackageName();
 		final String[] notifyIds = intent.getStringArrayExtra(EXTRA_NOTIFY_IDS);
-		final ConfirmNotifications request = new ConfirmNotifications(packageName, startId, notifyIds);
+		final ConfirmNotifications request = new ConfirmNotifications(
+				packageName, startId, notifyIds);
 		runRequestOrQueue(request);
 	}
 
@@ -131,7 +143,8 @@ public class BillingService extends Service implements ServiceConnection {
 		final String packageName = getPackageName();
 		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
 		final String[] notifyIds = intent.getStringArrayExtra(EXTRA_NOTIFY_IDS);
-		final GetPurchaseInformation request = new GetPurchaseInformation(packageName, startId, notifyIds);
+		final GetPurchaseInformation request = new GetPurchaseInformation(
+				packageName, startId, notifyIds);
 		request.setNonce(nonce);
 		runRequestOrQueue(request);
 	}
@@ -153,25 +166,25 @@ public class BillingService extends Service implements ServiceConnection {
 	}
 
 	// This is the old onStart method that will be called on the pre-2.0
-	// platform.  On 2.0 or later we override onStartCommand() so this
+	// platform. On 2.0 or later we override onStartCommand() so this
 	// method will not be called.
 	@Override
 	public void onStart(Intent intent, int startId) {
-	    handleCommand(intent, startId);
+		handleCommand(intent, startId);
 	}
 
 	// @Override // Avoid compile errors on pre-2.0
 	public int onStartCommand(Intent intent, int flags, int startId) {
-	    handleCommand(intent, startId);
-	    return Compatibility.START_NOT_STICKY;
+		handleCommand(intent, startId);
+		return Compatibility.START_NOT_STICKY;
 	}
-	
+
 	private void handleCommand(Intent intent, int startId) {
 		final Action action = getActionFromIntent(intent);
 		if (action == null) {
 			return;
 		}
-		switch (action) {			
+		switch (action) {
 		case CHECK_BILLING_SUPPORTED:
 			checkBillingSupported(startId);
 			break;
@@ -192,25 +205,28 @@ public class BillingService extends Service implements ServiceConnection {
 	private void requestPurchase(Intent intent, int startId) {
 		final String packageName = getPackageName();
 		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
-		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
-		final RequestPurchase request = new RequestPurchase(packageName, startId, itemId, developerPayload);
+		final String developerPayload = intent
+				.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
+		final RequestPurchase request = new RequestPurchase(packageName,
+				startId, itemId, developerPayload);
 		runRequestOrQueue(request);
 	}
 
 	private void restoreTransactions(Intent intent, int startId) {
 		final String packageName = getPackageName();
 		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
-		final RestoreTransactions request = new RestoreTransactions(packageName, startId);
+		final RestoreTransactions request = new RestoreTransactions(
+				packageName, startId);
 		request.setNonce(nonce);
 		runRequestOrQueue(request);
 	}
 
 	private void runPendingRequests() {
 		BillingRequest request;
-		int maxStartId = -1;		
+		int maxStartId = -1;
 		while ((request = mPendingRequests.peek()) != null) {
 			if (mService != null) {
-				runRequest(request);
+				runRequest(request, 1);
 				mPendingRequests.remove();
 				if (maxStartId < request.getStartId()) {
 					maxStartId = request.getStartId();
@@ -225,25 +241,27 @@ public class BillingService extends Service implements ServiceConnection {
 		}
 	}
 
-	private void runRequest(BillingRequest request) {
+	private void runRequest(BillingRequest request, int counter) {
 		try {
 			final long requestId = request.run(mService);
 			BillingController.onRequestSent(requestId, request);
 		} catch (RemoteException e) {
-			Log.w(this.getClass().getSimpleName(), "Remote billing service crashed");
-			// TODO: Retry?
+			Log.w(this.getClass().getSimpleName(),
+					"Remote billing service crashed (Tries: " + counter + ")",
+					e);
+			runRequest(request, 2);
 		}
 	}
 
 	private void runRequestOrQueue(BillingRequest request) {
 		mPendingRequests.add(request);
-		if (mService == null) {			
-			bindMarketBillingService();		
+		if (mService == null) {
+			bindMarketBillingService();
 		} else {
 			runPendingRequests();
 		}
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
