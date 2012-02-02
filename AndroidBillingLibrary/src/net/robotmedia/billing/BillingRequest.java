@@ -170,6 +170,8 @@ public abstract class BillingRequest {
     		super.onResponseCode(response);
     		if (response == ResponseCode.RESULT_OK) {
     			BillingController.onTransactionsRestored();
+    		} else {
+    			BillingController.onErrorRestoreTransactions(response);
     		}
     	}
     	

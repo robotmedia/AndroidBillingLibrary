@@ -25,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionManager;
 import net.robotmedia.billing.security.DefaultSignatureValidator;
@@ -430,6 +431,12 @@ public class BillingController {
 	protected static void onTransactionsRestored() {
 		for (IBillingObserver o : observers) {
 			o.onTransactionsRestored();
+		}
+	}
+	
+	protected static void onErrorRestoreTransactions(ResponseCode responseCode) {
+		for (IBillingObserver o : observers) {
+			o.onErrorRestoreTransactions(responseCode);
 		}
 	}
 
