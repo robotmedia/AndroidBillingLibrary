@@ -115,6 +115,8 @@ public class BillingController {
 	public static BillingStatus checkBillingSupported(Context context) {
 		if (status == BillingStatus.UNKNOWN) {
 			BillingService.checkBillingSupported(context);
+		} else {
+			onBillingChecked(status == BillingStatus.SUPPORTED);
 		}
 		return status;
 	}
