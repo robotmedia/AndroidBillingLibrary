@@ -44,6 +44,7 @@ public class BillingService extends Service implements ServiceConnection {
 	private static final String EXTRA_ITEM_ID = "ITEM_ID";
 	private static final String EXTRA_NONCE = "EXTRA_NONCE";
 	private static final String EXTRA_NOTIFY_IDS = "NOTIFY_IDS";
+	private static final int MAX_RETRIES = 2;
 	private static LinkedList<BillingRequest> mPendingRequests = new LinkedList<BillingRequest>();
 
 	private static IMarketBillingService mService;
@@ -249,7 +250,9 @@ public class BillingService extends Service implements ServiceConnection {
 			Log.w(this.getClass().getSimpleName(),
 					"Remote billing service crashed (Tries: " + counter + ")",
 					e);
-			runRequest(request, 2);
+			if (counter < MAX_RETRIES) {
+				runRequest(request, counter + 1);
+			}
 		}
 	}
 
