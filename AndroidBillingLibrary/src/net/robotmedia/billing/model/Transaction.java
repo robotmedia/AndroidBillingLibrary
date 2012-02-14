@@ -44,7 +44,7 @@ public class Transaction {
 
 	static final String PURCHASE_TIME = "purchaseTime";
 	
-    public static Transaction parse(JSONObject json) throws JSONException {
+    public static Transaction parse(JSONObject json, String signedData, String signature) throws JSONException {
     	final Transaction transaction = new Transaction();
         final int response = json.getInt(PURCHASE_STATE);
         transaction.purchaseState = PurchaseState.valueOf(response);
@@ -54,6 +54,10 @@ public class Transaction {
         transaction.orderId = json.optString(ORDER_ID, null);
         transaction.notificationId = json.optString(NOTIFICATION_ID, null);
         transaction.developerPayload = json.optString(DEVELOPER_PAYLOAD, null);
+
+        transaction.signedData = signedData;
+        transaction.signature = signature;
+
         return transaction;
     }
 
@@ -64,11 +68,13 @@ public class Transaction {
     public String productId;
     public PurchaseState purchaseState;
     public long purchaseTime;
+    public String signedData;
+    public String signature;
     
     public Transaction() {}
     
     public Transaction(String orderId, String productId, String packageName, PurchaseState purchaseState,
-			String notificationId, long purchaseTime, String developerPayload) {
+			String notificationId, long purchaseTime, String developerPayload, String signedData, String signature) {
 		this.orderId = orderId;
 		this.productId = productId;
 		this.packageName = packageName;
@@ -76,10 +82,12 @@ public class Transaction {
 		this.notificationId = notificationId;
 		this.purchaseTime = purchaseTime;
 		this.developerPayload = developerPayload;
+		this.signedData = signedData;
+		this.signature = signature;
 	}
     
 	public Transaction clone() {
-		return new Transaction(orderId, productId, packageName, purchaseState, notificationId, purchaseTime, developerPayload);
+		return new Transaction(orderId, productId, packageName, purchaseState, notificationId, purchaseTime, developerPayload, signedData, signature);
 	}
 
 	@Override

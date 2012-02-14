@@ -362,7 +362,7 @@ public class BillingController {
 				Log.w(LOG_TAG, "Invalid nonce");
 				return;
 			}
-			purchases = parsePurchases(jObject);
+			purchases = parsePurchases(jObject, signedData, signature);
 		} catch (JSONException e) {
 			Log.e(LOG_TAG, "JSON exception: ", e);
 			return;
@@ -443,7 +443,7 @@ public class BillingController {
 	 * @throws JSONException
 	 *             if the data couldn't be properly parsed.
 	 */
-	private static List<Transaction> parsePurchases(JSONObject data) throws JSONException {
+	private static List<Transaction> parsePurchases(JSONObject data, String signedData, String signature) throws JSONException {
 		ArrayList<Transaction> purchases = new ArrayList<Transaction>();
 		JSONArray orders = data.optJSONArray(JSON_ORDERS);
 		int numTransactions = 0;
@@ -452,7 +452,7 @@ public class BillingController {
 		}
 		for (int i = 0; i < numTransactions; i++) {
 			JSONObject jElement = orders.getJSONObject(i);
-			Transaction p = Transaction.parse(jElement);
+			Transaction p = Transaction.parse(jElement, signedData, signature);
 			purchases.add(p);
 		}
 		return purchases;
