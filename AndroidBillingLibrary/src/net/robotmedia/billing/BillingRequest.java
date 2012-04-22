@@ -235,7 +235,14 @@ public abstract class BillingRequest {
     public long run(IMarketBillingService mService) throws RemoteException {
         final Bundle request = makeRequestBundle();
         addParams(request);
-        final Bundle response = mService.sendBillingRequest(request);
+        final Bundle response;
+        try {
+            response = mService.sendBillingRequest(request);        	
+        } catch (NullPointerException e) {
+    		Log.e(this.getClass().getSimpleName(), "Known IAB bug. See: http://code.google.com/p/marketbilling/issues/detail?id=25", e);
+        	return IGNORE_REQUEST_ID;        	
+        }
+
         if (validateResponse(response)) {
         	processOkResponse(response);
         	return response.getLong(KEY_REQUEST_ID, IGNORE_REQUEST_ID);
