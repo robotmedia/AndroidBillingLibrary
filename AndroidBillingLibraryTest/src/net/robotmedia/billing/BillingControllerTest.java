@@ -46,6 +46,11 @@ public class BillingControllerTest extends AndroidTestCase {
 		mData = new BillingDB(getContext());
 	}
 	
+	@SmallTest
+	public void testCheckBillingSupported() throws Exception {
+		BillingController.checkBillingSupported(getContext());
+	}
+	
 	@MediumTest
 	public void testIsPurchased() throws Exception {
 		assertFalse(BillingController.isPurchased(getContext(), TransactionTest.TRANSACTION_1.productId));

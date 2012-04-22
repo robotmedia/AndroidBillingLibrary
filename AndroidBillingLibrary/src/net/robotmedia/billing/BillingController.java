@@ -103,9 +103,10 @@ public class BillingController {
 	}
 
 	/**
-	 * Returns the billing status. If it is currently unknown, checks the billing
-	 * status asynchronously, in which case observers will eventually receive
-	 * a {@link IBillingObserver#onBillingChecked(boolean)} notification.
+	 * Returns the billing status. If it is currently unknown, checks the
+	 * billing status asynchronously. Observers will receive a
+	 * {@link IBillingObserver#onBillingChecked(boolean)} notification in either
+	 * case.
 	 * 
 	 * @param context
 	 * @return the current billing status (unknown, supported or unsupported).
@@ -114,6 +115,9 @@ public class BillingController {
 	public static BillingStatus checkBillingSupported(Context context) {
 		if (status == BillingStatus.UNKNOWN) {
 			BillingService.checkBillingSupported(context);
+		} else {
+			boolean supported = status == BillingStatus.SUPPORTED;
+			onBillingChecked(supported);
 		}
 		return status;
 	}
