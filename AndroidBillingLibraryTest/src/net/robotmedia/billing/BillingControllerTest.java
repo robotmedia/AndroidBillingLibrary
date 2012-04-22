@@ -101,6 +101,7 @@ public class BillingControllerTest extends AndroidTestCase {
 			public void onBillingChecked(boolean supported) {}
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {}
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
+			public void onErrorRestoreTransactions(ResponseCode responseCode) {}
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onTransactionsRestored();
@@ -123,8 +124,8 @@ public class BillingControllerTest extends AndroidTestCase {
 				assertEquals(testItemId, itemId);
 				assertEquals(testResponse, response);
 			}
-			@Override
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
+			public void onErrorRestoreTransactions(ResponseCode responseCode) {}
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onRequestPurchaseResponse(testItemId, testResponse);

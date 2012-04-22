@@ -22,6 +22,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import net.robotmedia.billing.BillingController;
 import net.robotmedia.billing.IBillingObserver;
+import net.robotmedia.billing.BillingRequest.ResponseCode;
 
 /**
  * Abstract subclass of IBillingObserver that provides default implementations
@@ -65,5 +66,9 @@ public abstract class AbstractBillingObserver implements IBillingObserver {
 		editor.putBoolean(KEY_TRANSACTIONS_RESTORED, true);
 		editor.commit();
 	}
-
+	
+	@Override
+	public void onErrorRestoreTransactions(ResponseCode responseCode) {
+		// ignore errors when restoring transactions
+	}
 }

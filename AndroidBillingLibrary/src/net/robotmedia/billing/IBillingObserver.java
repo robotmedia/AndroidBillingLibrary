@@ -70,4 +70,8 @@ public interface IBillingObserver {
 	 */
 	public void onTransactionsRestored();
 
+	/**
+	 * Called when a restore transactions request ended with a server error.
+	 */
+	public void onErrorRestoreTransactions(ResponseCode responseCode);
 }
