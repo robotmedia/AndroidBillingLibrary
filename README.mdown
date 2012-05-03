@@ -7,14 +7,14 @@ That's how simple it should be to use [Android In-app Billing][1].
 
 And with this library it is.
 
-(or will be; this is a very early release)
-
 *Android Billing Library* implements in-app billing's full specification and offers high-level classes to use it. Transactions are stored in a local obfuscated database which can be easily queried.
 
 Getting Started
 ===============
 
-* Add this library to your project.
+* Get acquainted with the [Android In-app Billing][1] documentation.
+
+* Add *Android Billing Library* to your project.
 
 * Open the *AndroidManifest.xml* of your application and add this permission...
 
@@ -41,13 +41,13 @@ Usage
 Subclassing AbstractBillingActivity
 -----------------------------------
 
-[AbstractBillingActivity][2] is an abstract activity that provides default integration with in-app billing. It is useful to get acquainted with the library, or for very simple applications that require in-app billing integration in only one activity. For more flexibility use [BillingController][3] instead.
+[AbstractBillingActivity][2] is an abstract activity that provides default integration with in-app billing. It is useful to get acquainted with the library, or for very simple applications that require in-app billing integration in only one activity. For more flexibility use [BillingController][3] directly instead.
 
 When created your [AbstractBillingActivity][2] instance will check if in-app billing is supported, followed by a call to `onBillingChecked(boolean)`, which has to be implemented by the subclass.
 
 Additionally, your [AbstractBillingActivity][2] subclass will attempt to restore all transactions, only once. This is necessary in case the user has previously installed the app and made purchases. Existing transactions will generate calls to `onPurchaseStateChange(String, PurchaseState)`, which has to be implemented by the subclass.
 
-Starting a purchase is as simple as calling `requestPurchase(String)`. [AbstractBillingActivity][2] will start the Android Market intent automatically and `onPurchaseStateChange(String, PurchaseState)` will be called after the transaction is confirmed.
+Starting a purchase is as simple as calling `requestPurchase(String)`. [AbstractBillingActivity][2] will start the Google Play intent automatically and `onPurchaseStateChange(String, PurchaseState)` will be called after the transaction is confirmed.
 
 If you override any of the methods provided by [AbstractBillingActivity][2], make sure to call the superclass implementation.
 
@@ -65,17 +65,12 @@ Dungeons Redux
 
 [Dungeons Redux][5] is a sample app that shows how to use *Android Billing Library* through [BillingController][3]. It is a simplified version of the Dungeons in-app billing example provided by Google.
 
-It should be noted that Dungeons Redux does not intend to be an  example of how to use in-app billing in general.
-
-Disclaimer
-==========
-
-**This library is a very early release and it should not be used as production code.**
+It should be noted that Dungeons Redux does not intend to be an example of how to use in-app billing in general.
 
 Contact
 =======
 
-http://www.twitter.com/robot_media | http://www.facebook.com/robotmedia | http://www.robotmedia.net
+http://www.twitter.com/robotmedia | http://www.facebook.com/robotmedia | http://www.robotmedia.net
 
 License
 =======
