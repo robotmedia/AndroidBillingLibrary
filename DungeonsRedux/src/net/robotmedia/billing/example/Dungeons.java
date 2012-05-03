@@ -82,6 +82,12 @@ public class Dungeons extends Activity {
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
 				Dungeons.this.onRequestPurchaseResponse(itemId, response);
 			}
+			
+			@Override
+			public void onTransactionsRestoreFailed() {
+				super.onTransactionsRestoreFailed();
+				Toast.makeText(Dungeons.this, R.string.failed_to_restore_transactions, Toast.LENGTH_SHORT).show();
+			}
 		};
 		
 		setContentView(R.layout.main);
@@ -125,7 +131,7 @@ public class Dungeons extends Activity {
 	private void restoreTransactions() {
 		if (!mBillingObserver.isTransactionsRestored()) {
 			BillingController.restoreTransactions(this);
-			Toast.makeText(this, R.string.restoring_transactions, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.restoring_transactions, Toast.LENGTH_SHORT).show();
 		}
 	}
 

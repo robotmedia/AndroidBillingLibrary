@@ -436,6 +436,12 @@ public class BillingController {
 			o.onTransactionsRestored();
 		}
 	}
+	
+	protected static void onTransactionsRestoreFailed() {
+		for (IBillingObserver o : observers) {
+			o.onTransactionsRestoreFailed();
+		}
+	}
 
 	/**
 	 * Parse all purchases from the JSON data received from the Market Billing
@@ -630,6 +636,12 @@ public class BillingController {
 	protected static void onRequestPurchaseResponse(String itemId, BillingRequest.ResponseCode response) {
 		for (IBillingObserver o : observers) {
 			o.onRequestPurchaseResponse(itemId, response);
+		}
+	}
+
+	protected static void onServiceError() {
+		for (IBillingObserver o : observers) {
+			o.onServiceError();
 		}
 	}
 

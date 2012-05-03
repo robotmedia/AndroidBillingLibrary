@@ -25,6 +25,7 @@
      service is not available at this time.  You can continue to use this app but you
      won\'t be able to make purchases.</string>
     <string name="restoring_transactions">Restoring transactions</string>
+    <string name="failed_to_restore_transactions">Fail to restore transaction</string>
     <string name="buy">Buy</string>
     <string name="select_item">Select an item</string>
     <string name="items_for_sale">Items for sale</string>

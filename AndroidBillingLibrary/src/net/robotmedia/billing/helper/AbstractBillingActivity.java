@@ -80,7 +80,7 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 		BillingController.setConfiguration(null);
 	}
 
-	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state);;
+	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state);
 
 	public abstract void onRequestPurchaseResponse(String itemId, ResponseCode response);
 

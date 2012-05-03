@@ -66,4 +66,13 @@ public abstract class AbstractBillingObserver implements IBillingObserver {
 		editor.commit();
 	}
 
+	@Override
+	public void onTransactionsRestoreFailed() {
+		
+	}
+	
+	@Override
+	public void onServiceError() {
+		
+	}
 }

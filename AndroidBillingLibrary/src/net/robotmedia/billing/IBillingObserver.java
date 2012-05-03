@@ -70,4 +70,13 @@ public interface IBillingObserver {
 	 */
 	public void onTransactionsRestored();
 
+	/**
+	 * Called when a restore transaction request request failed.
+	 */
+	public void onTransactionsRestoreFailed();
+
+	/**
+	 * Called when the market service crash
+	 */
+	public void onServiceError();
 }
