@@ -141,13 +141,11 @@ public class BillingService extends Service implements ServiceConnection {
 		return null;
 	}
 
-	@Override
 	public void onServiceConnected(ComponentName name, IBinder service) {
 		mService = IMarketBillingService.Stub.asInterface(service);
 		runPendingRequests();
 	}
 
-	@Override
 	public void onServiceDisconnected(ComponentName name) {
 		mService = null;
 	}

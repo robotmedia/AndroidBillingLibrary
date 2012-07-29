@@ -46,17 +46,14 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 
 		mBillingObserver = new AbstractBillingObserver(this) {
 
-			@Override
 			public void onBillingChecked(boolean supported) {
 				AbstractBillingActivity.this.onBillingChecked(supported);
 			}
 
-			@Override
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
 				AbstractBillingActivity.this.onPurchaseStateChanged(itemId, state);
 			}
 
-			@Override
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
 				AbstractBillingActivity.this.onRequestPurchaseResponse(itemId, response);
 			}
