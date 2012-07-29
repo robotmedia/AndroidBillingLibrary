@@ -128,7 +128,6 @@ public class BillingControllerTest extends AndroidTestCase {
 				assertEquals(testItemId, itemId);
 				assertEquals(testResponse, response);
 			}
-			@Override
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
 		};
 		BillingController.registerObserver(observer);

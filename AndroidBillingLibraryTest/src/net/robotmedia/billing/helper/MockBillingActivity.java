@@ -26,13 +26,11 @@ public class MockBillingActivity extends AbstractBillingActivity {
 
 	}
 
-	@Override
 	public byte[] getObfuscationSalt() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String getPublicKey() {
 		// TODO Auto-generated method stub
 		return null;
