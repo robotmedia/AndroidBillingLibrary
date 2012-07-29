@@ -79,6 +79,11 @@ public class Dungeons extends Activity {
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
 				Dungeons.this.onRequestPurchaseResponse(itemId, response);
 			}
+
+			public void onSubscriptionChecked(boolean supported) {
+				Dungeons.this.onSubscriptionChecked(supported);
+			}
+		
 		};
 		
 		setContentView(R.layout.main);
@@ -86,6 +91,7 @@ public class Dungeons extends Activity {
 		setupWidgets();
 		BillingController.registerObserver(mBillingObserver);
 		BillingController.checkBillingSupported(this);
+		BillingController.checkSubscriptionSupported(this);
 		updateOwnedItems();
 	}
 
@@ -111,6 +117,10 @@ public class Dungeons extends Activity {
 	}
 
 	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
+	}
+	
+	public void onSubscriptionChecked(boolean supported) {
+		
 	}
 
 	/**

@@ -35,7 +35,7 @@ import android.util.Log;
 public class BillingService extends Service implements ServiceConnection {
 
 	private static enum Action {
-		CHECK_BILLING_SUPPORTED, CONFIRM_NOTIFICATIONS, GET_PURCHASE_INFORMATION, REQUEST_PURCHASE, RESTORE_TRANSACTIONS,
+		CHECK_BILLING_SUPPORTED, CHECK_SUBSCRIPTION_SUPPORTED, CONFIRM_NOTIFICATIONS, GET_PURCHASE_INFORMATION, REQUEST_PURCHASE, RESTORE_TRANSACTIONS
 	}
 
 	private static final String ACTION_MARKET_BILLING_SERVICE = "com.android.vending.billing.MarketBillingService.BIND";
@@ -53,6 +53,11 @@ public class BillingService extends Service implements ServiceConnection {
 		context.startService(intent);
 	}
 
+	public static void checkSubscriptionSupported(Context context) {
+		final Intent intent = createIntent(context, Action.CHECK_SUBSCRIPTION_SUPPORTED);
+		context.startService(intent);
+	}
+	
 	public static void confirmNotifications(Context context, String[] notifyIds) {
 		final Intent intent = createIntent(context, Action.CONFIRM_NOTIFICATIONS);
 		intent.putExtra(EXTRA_NOTIFY_IDS, notifyIds);
@@ -105,6 +110,12 @@ public class BillingService extends Service implements ServiceConnection {
 	private void checkBillingSupported(int startId) {
 		final String packageName = getPackageName();
 		final CheckBillingSupported request = new CheckBillingSupported(packageName, startId);
+		runRequestOrQueue(request);
+	}
+	
+	private void checkSubscriptionSupported(int startId) {
+		final String packageName = getPackageName();
+		final CheckSubscriptionSupported request = new CheckSubscriptionSupported(packageName, startId);
 		runRequestOrQueue(request);
 	}
 
@@ -172,6 +183,9 @@ public class BillingService extends Service implements ServiceConnection {
 		switch (action) {			
 		case CHECK_BILLING_SUPPORTED:
 			checkBillingSupported(startId);
+			break;
+		case CHECK_SUBSCRIPTION_SUPPORTED:
+			checkSubscriptionSupported(startId);
 			break;
 		case REQUEST_PURCHASE:
 			requestPurchase(intent, startId);

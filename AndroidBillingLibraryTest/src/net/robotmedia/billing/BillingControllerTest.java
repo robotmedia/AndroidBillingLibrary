@@ -51,6 +51,11 @@ public class BillingControllerTest extends AndroidTestCase {
 		BillingController.checkBillingSupported(getContext());
 	}
 	
+	@SmallTest
+	public void testCheckSubscriptionSupported() throws Exception {
+		BillingController.checkSubscriptionSupported(getContext());
+	}
+	
 	@MediumTest
 	public void testIsPurchased() throws Exception {
 		assertFalse(BillingController.isPurchased(getContext(), TransactionTest.TRANSACTION_1.productId));
@@ -106,6 +111,7 @@ public class BillingControllerTest extends AndroidTestCase {
 			public void onBillingChecked(boolean supported) {}
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {}
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
+			public void onSubscriptionChecked(boolean supported) {};
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onTransactionsRestored();
@@ -129,6 +135,7 @@ public class BillingControllerTest extends AndroidTestCase {
 				assertEquals(testResponse, response);
 			}
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
+			public void onSubscriptionChecked(boolean supported) {};
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onRequestPurchaseResponse(testItemId, testResponse);

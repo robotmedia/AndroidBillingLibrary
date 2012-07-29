@@ -41,6 +41,11 @@ public class BillingServiceTest extends ServiceTestCase<BillingService> {
 	public void testCheckBillingSupported() throws Exception {
 		BillingService.checkBillingSupported(getContext());
 	}
+	
+	@SmallTest
+	public void testCheckSubscriptionSupported() throws Exception {
+		BillingService.checkSubscriptionSupported(getContext());
+	}
 
 	@SmallTest
 	public void testConfirmNotifications() throws Exception {

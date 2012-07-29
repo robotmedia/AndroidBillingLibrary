@@ -23,7 +23,11 @@ public class MockBillingActivity extends AbstractBillingActivity {
 	@Override
 	public void onBillingChecked(boolean supported) {
 		// TODO Auto-generated method stub
-
+	}
+	
+	@Override
+	public void onSubscriptionChecked(boolean supported) {
+		// TODO Auto-generated method stub		
 	}
 
 	public byte[] getObfuscationSalt() {

@@ -24,6 +24,9 @@ import com.android.vending.billing.IMarketBillingService;
 
 public abstract class BillingRequest {
 
+    private static final String ITEM_TYPE_SUBSCRIPTION = "subs";
+    private static final String REQUEST_TYPE_CHECK_BILLING_SUPPORTED = "CHECK_BILLING_SUPPORTED";
+	
 	public static class CheckBillingSupported extends BillingRequest {
 		
     	public CheckBillingSupported(String packageName, int startId) {
@@ -32,7 +35,7 @@ public abstract class BillingRequest {
 
     	@Override
     	public String getRequestType() {
-    		return "CHECK_BILLING_SUPPORTED";
+    		return REQUEST_TYPE_CHECK_BILLING_SUPPORTED;
     	}
 
     	@Override
@@ -42,6 +45,35 @@ public abstract class BillingRequest {
     	}
     	
     }
+	
+	public static class CheckSubscriptionSupported extends BillingRequest {
+
+		private static final String KEY_API_VERSION = "API_VERSION";
+	    private static final String KEY_ITEM_TYPE = "ITEM_TYPE";
+		
+	    public CheckSubscriptionSupported(String packageName, int startId) {
+			super(packageName, startId);
+		}
+	    
+    	@Override
+    	public String getRequestType() {
+    		return REQUEST_TYPE_CHECK_BILLING_SUPPORTED;
+    	}
+
+    	@Override
+    	protected void processOkResponse(Bundle response) {
+    		final boolean supported = this.isSuccess();
+    		BillingController.onSubscriptionChecked(supported);
+    	}
+		
+    	@Override
+    	protected void addParams(Bundle request) {
+    		request.putInt(KEY_API_VERSION, 2);
+    		request.putString(KEY_ITEM_TYPE, ITEM_TYPE_SUBSCRIPTION);
+    	}
+    	
+    }
+	
     public static class ConfirmNotifications extends BillingRequest {
 
     	private String[] notifyIds;

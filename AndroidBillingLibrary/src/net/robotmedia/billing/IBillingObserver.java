@@ -22,13 +22,25 @@ import android.app.PendingIntent;
 public interface IBillingObserver {
 
 	/**
-	 * Called only once after determining if in-app billing is supported or not.
+	 * Called after checking if in-app product billing is supported or not.
 	 * 
 	 * @param supported
-	 *            if true, in-app billing is supported. Otherwise, it isn't.
+	 *            if true, in-app product billing is supported. If false, in-app
+	 *            product billing is not supported, and neither is subscription
+	 *            billing.
 	 * @see BillingController#checkBillingSupported(android.content.Context)
 	 */
 	public void onBillingChecked(boolean supported);
+
+	/**
+	 * Called after checking if subscription billing is supported or not.
+	 * 
+	 * @param supported
+	 *            if true, subscription billing is supported, and also is in-app
+	 *            product billing. Otherwise, subscription billing is not
+	 *            supported.
+	 */
+	public void onSubscriptionChecked(boolean supported);
 
 	/**
 	 * Called after requesting the purchase of the specified item.

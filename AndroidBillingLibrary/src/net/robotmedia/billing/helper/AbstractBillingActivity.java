@@ -26,19 +26,54 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 	protected AbstractBillingObserver mBillingObserver;
 
 	/**
-	 * Returns the billing status. If it's currently unknown, requests to check
-	 * if billing is supported and
-	 * {@link AbstractBillingActivity#onBillingChecked(boolean)} should be
-	 * called later with the result.
+	 * <p>
+	 * Returns the in-app product billing support status, and checks it
+	 * asynchronously if it is currently unknown.
+	 * {@link AbstractBillingActivity#onBillingChecked(boolean)} will be called
+	 * eventually with the result.
+	 * </p>
+	 * <p>
+	 * In-app product support does not imply subscription support. To check if
+	 * subscriptions are supported, use
+	 * {@link AbstractBillingActivity#checkSubscriptionSupported()}.
+	 * </p>
 	 * 
-	 * @return the current billing status (unknown, supported or unsupported).
+	 * @return the current in-app product billing support status (unknown,
+	 *         supported or unsupported). If it is unsupported, subscriptions
+	 *         are also unsupported.
 	 * @see AbstractBillingActivity#onBillingChecked(boolean)
+	 * @see AbstractBillingActivity#checkSubscriptionSupported()
 	 */
 	public BillingStatus checkBillingSupported() {
 		return BillingController.checkBillingSupported(this);
 	}
 
+	/**
+	 * <p>
+	 * Returns the subscription billing support status, and checks it
+	 * asynchronously if it is currently unknown.
+	 * {@link AbstractBillingActivity#onSubscriptionChecked(boolean)} will be
+	 * called eventually with the result.
+	 * </p>
+	 * <p>
+	 * No support for subscriptions does not imply that in-app products are also
+	 * unsupported. To check if subscriptions are supported, use
+	 * {@link AbstractBillingActivity#checkSubscriptionSupported()}.
+	 * </p>
+	 * 
+	 * @return the current in-app product billing support status (unknown,
+	 *         supported or unsupported). If it is unsupported, subscriptions
+	 *         are also unsupported.
+	 * @see AbstractBillingActivity#onBillingChecked(boolean)
+	 * @see AbstractBillingActivity#checkSubscriptionSupported()
+	 */
+	public BillingStatus checkSubscriptionSupported() {
+		return BillingController.checkSubscriptionSupported(this);
+	}
+
 	public abstract void onBillingChecked(boolean supported);
+	
+	public abstract void onSubscriptionChecked(boolean supported);
 
 	@Override
 	protected void onCreate(android.os.Bundle savedInstanceState) {
@@ -48,6 +83,10 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 
 			public void onBillingChecked(boolean supported) {
 				AbstractBillingActivity.this.onBillingChecked(supported);
+			}
+			
+			public void onSubscriptionChecked(boolean supported) {
+				AbstractBillingActivity.this.onSubscriptionChecked(supported);
 			}
 
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
