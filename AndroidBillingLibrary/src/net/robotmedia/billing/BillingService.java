@@ -40,8 +40,8 @@ public class BillingService extends Service implements ServiceConnection {
 
 	private static final String ACTION_MARKET_BILLING_SERVICE = "com.android.vending.billing.MarketBillingService.BIND";
 	private static final String EXTRA_DEVELOPER_PAYLOAD = "DEVELOPER_PAYLOAD";
-
 	private static final String EXTRA_ITEM_ID = "ITEM_ID";
+	private static final String EXTRA_ITEM_TYPE = "ITEM_TYPE";
 	private static final String EXTRA_NONCE = "EXTRA_NONCE";
 	private static final String EXTRA_NOTIFY_IDS = "NOTIFY_IDS";
 	private static LinkedList<BillingRequest> mPendingRequests = new LinkedList<BillingRequest>();
@@ -85,6 +85,15 @@ public class BillingService extends Service implements ServiceConnection {
 	public static void requestPurchase(Context context, String itemId, String developerPayload) {
 		final Intent intent = createIntent(context, Action.REQUEST_PURCHASE);
 		intent.putExtra(EXTRA_ITEM_ID, itemId);
+		intent.putExtra(EXTRA_ITEM_TYPE, BillingRequest.ITEM_TYPE_INAPP);
+		intent.putExtra(EXTRA_DEVELOPER_PAYLOAD, developerPayload);
+		context.startService(intent);
+	}
+	
+	public static void requestSubscription(Context context, String itemId, String developerPayload) {
+		final Intent intent = createIntent(context, Action.REQUEST_PURCHASE);
+		intent.putExtra(EXTRA_ITEM_ID, itemId);
+		intent.putExtra(EXTRA_ITEM_TYPE, BillingRequest.ITEM_TYPE_SUBSCRIPTION);
 		intent.putExtra(EXTRA_DEVELOPER_PAYLOAD, developerPayload);
 		context.startService(intent);
 	}
@@ -204,8 +213,9 @@ public class BillingService extends Service implements ServiceConnection {
 	private void requestPurchase(Intent intent, int startId) {
 		final String packageName = getPackageName();
 		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
+		final String itemType = intent.getStringExtra(EXTRA_ITEM_TYPE);
 		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
-		final RequestPurchase request = new RequestPurchase(packageName, startId, itemId, developerPayload);
+		final RequestPurchase request = new RequestPurchase(packageName, startId, itemId, itemType, developerPayload);
 		runRequestOrQueue(request);
 	}
 

@@ -537,6 +537,10 @@ public class BillingController {
 	/**
 	 * Requests the purchase of the specified item. The transaction will not be
 	 * confirmed automatically.
+	 * <p>
+	 * For subscriptions, use {@link #requestSubscription(Context, String)}
+	 * instead.
+	 * </p>
 	 * 
 	 * @param context
 	 * @param itemId
@@ -548,8 +552,14 @@ public class BillingController {
 	}
 
 	/**
+	 * <p>
 	 * Requests the purchase of the specified item with optional automatic
 	 * confirmation.
+	 * </p>
+	 * <p>
+	 * For subscriptions, use
+	 * {@link #requestSubscription(Context, String, boolean)} instead.
+	 * </p>
 	 * 
 	 * @param context
 	 * @param itemId
@@ -560,11 +570,46 @@ public class BillingController {
 	 *            to {@link #confirmNotifications(Context, String)}.
 	 * @see IBillingObserver#onPurchaseIntent(String, PendingIntent)
 	 */
-	public static void requestPurchase(Context context, String itemId, boolean confirm) {
+	public static void requestPurchase(Context context, String itemId,
+			boolean confirm) {
 		if (confirm) {
 			automaticConfirmations.add(itemId);
 		}
 		BillingService.requestPurchase(context, itemId, null);
+	}
+
+	/**
+	 * Requests the purchase of the specified subscription item. The transaction
+	 * will not be confirmed automatically.
+	 * 
+	 * @param context
+	 * @param itemId
+	 *            id of the item to be purchased.
+	 * @see #requestSubscription(Context, String, boolean)
+	 */
+	public static void requestSubscription(Context context, String itemId) {
+		requestSubscription(context, itemId, false);
+	}
+
+	/**
+	 * Requests the purchase of the specified subscription item with optional
+	 * automatic confirmation.
+	 * 
+	 * @param context
+	 * @param itemId
+	 *            id of the item to be purchased.
+	 * @param confirm
+	 *            if true, the transaction will be confirmed automatically. If
+	 *            false, the transaction will have to be confirmed with a call
+	 *            to {@link #confirmNotifications(Context, String)}.
+	 * @see IBillingObserver#onPurchaseIntent(String, PendingIntent)
+	 */
+	public static void requestSubscription(Context context, String itemId,
+			boolean confirm) {
+		if (confirm) {
+			automaticConfirmations.add(itemId);
+		}
+		BillingService.requestSubscription(context, itemId, null);
 	}
 
 	/**

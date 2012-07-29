@@ -136,6 +136,21 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 	}
 
 	/**
+	 * Requests the purchase of the specified subscription item. The transaction
+	 * will not be confirmed automatically; such confirmation could be handled
+	 * in {@link AbstractBillingActivity#onPurchaseExecuted(String)}. If
+	 * automatic confirmation is preferred use
+	 * {@link BillingController#requestPurchase(android.content.Context, String, boolean)}
+	 * instead.
+	 * 
+	 * @param itemId
+	 *            id of the item to be purchased.
+	 */
+	public void requestSubscription(String itemId) {
+		BillingController.requestSubscription(this, itemId);
+	}
+
+	/**
 	 * Requests to restore all transactions.
 	 */
 	public void restoreTransactions() {

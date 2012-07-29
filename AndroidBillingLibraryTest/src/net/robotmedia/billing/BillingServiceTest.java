@@ -63,6 +63,11 @@ public class BillingServiceTest extends ServiceTestCase<BillingService> {
 	}	
 
 	@SmallTest
+	public void testRequestSubscription() throws Exception {
+		BillingService.requestSubscription(getContext(), ITEM_ID, null);
+	}
+	
+	@SmallTest
 	public void testRestoreTransactions() throws Exception {
 		BillingService.restoreTransations(getContext(), NONCE);
 	}	

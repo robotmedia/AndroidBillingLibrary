@@ -24,8 +24,10 @@ import com.android.vending.billing.IMarketBillingService;
 
 public abstract class BillingRequest {
 
-    private static final String ITEM_TYPE_SUBSCRIPTION = "subs";
-    private static final String REQUEST_TYPE_CHECK_BILLING_SUPPORTED = "CHECK_BILLING_SUPPORTED";
+	public static final String ITEM_TYPE_INAPP = "inapp";
+	public static final String ITEM_TYPE_SUBSCRIPTION = "subs";
+    private static final String KEY_ITEM_TYPE = "ITEM_TYPE";
+	private static final String REQUEST_TYPE_CHECK_BILLING_SUPPORTED = "CHECK_BILLING_SUPPORTED";
 	
 	public static class CheckBillingSupported extends BillingRequest {
 		
@@ -49,7 +51,6 @@ public abstract class BillingRequest {
 	public static class CheckSubscriptionSupported extends BillingRequest {
 
 		private static final String KEY_API_VERSION = "API_VERSION";
-	    private static final String KEY_ITEM_TYPE = "ITEM_TYPE";
 		
 	    public CheckSubscriptionSupported(String packageName, int startId) {
 			super(packageName, startId);
@@ -123,21 +124,24 @@ public abstract class BillingRequest {
     public static class RequestPurchase extends BillingRequest {
 
     	private String itemId;
+    	private String itemType;
     	private String developerPayload;
     	
     	private static final String KEY_ITEM_ID = "ITEM_ID";
     	private static final String KEY_DEVELOPER_PAYLOAD = "DEVELOPER_PAYLOAD";
     	private static final String KEY_PURCHASE_INTENT = "PURCHASE_INTENT";
     	
-    	public RequestPurchase(String packageName, int startId, String itemId, String developerPayload) {
+    	public RequestPurchase(String packageName, int startId, String itemId, String itemType, String developerPayload) {
     		super(packageName, startId);
     		this.itemId = itemId;
+    		this.itemType = itemType;
     		this.developerPayload = developerPayload;
     	}
 
     	@Override
     	protected void addParams(Bundle request) {
     		request.putString(KEY_ITEM_ID, itemId);
+    		request.putString(KEY_ITEM_TYPE, itemType);
     		if (developerPayload != null) {
     			request.putString(KEY_DEVELOPER_PAYLOAD, developerPayload);
     		}
