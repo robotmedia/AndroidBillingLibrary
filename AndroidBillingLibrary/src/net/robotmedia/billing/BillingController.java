@@ -155,10 +155,10 @@ public class BillingController {
 		if (subscriptionStatus == BillingStatus.UNKNOWN) {
 			BillingService.checkSubscriptionSupported(context);
 		} else {
-			boolean supported = billingStatus == BillingStatus.SUPPORTED;
+			boolean supported = subscriptionStatus == BillingStatus.SUPPORTED;
 			onSubscriptionChecked(supported);
 		}
-		return billingStatus;
+		return subscriptionStatus;
 	}
 
 	/**
