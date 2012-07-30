@@ -23,6 +23,7 @@ import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.example.R;
 import net.robotmedia.billing.example.auxiliary.CatalogAdapter;
 import net.robotmedia.billing.example.auxiliary.CatalogEntry;
+import net.robotmedia.billing.example.auxiliary.CatalogEntry.Managed;
 import net.robotmedia.billing.helper.AbstractBillingObserver;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
@@ -41,7 +42,7 @@ public class Dungeons extends Activity {
 
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
 
-	private String mSku;
+	private CatalogEntry mSelectedItem;
 
 	private CatalogAdapter mCatalogAdapter;
 
@@ -142,7 +143,11 @@ public class Dungeons extends Activity {
 		mBuyButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				BillingController.requestPurchase(Dungeons.this, mSku, true /* confirm */);
+				if (mSelectedItem.managed != Managed.SUBSCRIPTION) {
+					BillingController.requestPurchase(Dungeons.this, mSelectedItem.sku, true /* confirm */);
+				} else {
+					BillingController.requestSubscription(Dungeons.this, mSelectedItem.sku, true /* confirm */);
+				}
 			}
 		});
 
@@ -152,7 +157,7 @@ public class Dungeons extends Activity {
 		mSelectItemSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				mSku = CatalogEntry.CATALOG[position].sku;
+				mSelectedItem = CatalogEntry.CATALOG[position];
 			}
 
 			public void onNothingSelected(AdapterView<?> arg0) {
