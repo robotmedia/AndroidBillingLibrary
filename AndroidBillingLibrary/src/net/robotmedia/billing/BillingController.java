@@ -206,7 +206,7 @@ public class BillingController {
 		itemId = salt != null ? Security.obfuscate(context, salt, itemId) : itemId;
 		return TransactionManager.countPurchases(context, itemId);
 	}
-	
+
 	protected static void debug(String message) {
 		if (debug) {
 			Log.d(LOG_TAG, message);
@@ -274,9 +274,8 @@ public class BillingController {
 
 	/**
 	 * Returns true if the specified item has been registered as purchased in
-	 * local memory. Note that if the item was later canceled or refunded this
-	 * will still return true. Also note that the item might have been purchased
-	 * in another installation, but not yet registered in this one.
+	 * local memory, false otherwise. Also note that the item might have been
+	 * purchased in another installation, but not yet registered in this one.
 	 * 
 	 * @param context
 	 * @param itemId
@@ -331,7 +330,9 @@ public class BillingController {
 	 */
 	protected static void onBillingChecked(boolean supported) {
 		billingStatus = supported ? BillingStatus.SUPPORTED : BillingStatus.UNSUPPORTED;
-		if (billingStatus == BillingStatus.UNSUPPORTED) { // Save us the subscription check
+		if (billingStatus == BillingStatus.UNSUPPORTED) { // Save us the
+															// subscription
+															// check
 			subscriptionStatus = BillingStatus.UNSUPPORTED;
 		}
 		for (IBillingObserver o : observers) {
@@ -382,10 +383,12 @@ public class BillingController {
 	 */
 	protected static void onPurchaseStateChanged(Context context, String signedData, String signature) {
 		debug("Purchase state changed");
-
+		
 		if (TextUtils.isEmpty(signedData)) {
 			Log.w(LOG_TAG, "Signed data is empty");
 			return;
+		} else {
+			debug(signedData);
 		}
 
 		if (!debug) {
@@ -433,8 +436,7 @@ public class BillingController {
 	}
 
 	/**
-	 * Called after a {@link net.robotmedia.billing.BillingRequest} is
-	 * sent.
+	 * Called after a {@link net.robotmedia.billing.BillingRequest} is sent.
 	 * 
 	 * @param requestId
 	 *            the id the request.
@@ -452,8 +454,7 @@ public class BillingController {
 	}
 
 	/**
-	 * Called after a {@link net.robotmedia.billing.BillingRequest} is
-	 * sent.
+	 * Called after a {@link net.robotmedia.billing.BillingRequest} is sent.
 	 * 
 	 * @param context
 	 * @param requestId
@@ -472,17 +473,18 @@ public class BillingController {
 			request.onResponseCode(response);
 		}
 	}
-	
+
 	/**
 	 * Called after the response to a
-	 * {@link net.robotmedia.billing.request.CheckSubscriptionSupported} request is
-	 * received.
+	 * {@link net.robotmedia.billing.request.CheckSubscriptionSupported} request
+	 * is received.
 	 * 
 	 * @param supported
 	 */
 	protected static void onSubscriptionChecked(boolean supported) {
 		subscriptionStatus = supported ? BillingStatus.SUPPORTED : BillingStatus.UNSUPPORTED;
-		if (subscriptionStatus == BillingStatus.SUPPORTED) { // Save us the billing check
+		if (subscriptionStatus == BillingStatus.SUPPORTED) { // Save us the
+																// billing check
 			billingStatus = BillingStatus.SUPPORTED;
 		}
 		for (IBillingObserver o : observers) {
@@ -548,7 +550,7 @@ public class BillingController {
 	 * @see #requestPurchase(Context, String, boolean)
 	 */
 	public static void requestPurchase(Context context, String itemId) {
-		requestPurchase(context, itemId, false);
+		requestPurchase(context, itemId, false, null);
 	}
 
 	/**
@@ -558,7 +560,7 @@ public class BillingController {
 	 * </p>
 	 * <p>
 	 * For subscriptions, use
-	 * {@link #requestSubscription(Context, String, boolean)} instead.
+	 * {@link #requestSubscription(Context, String, boolean, String)} instead.
 	 * </p>
 	 * 
 	 * @param context
@@ -568,14 +570,16 @@ public class BillingController {
 	 *            if true, the transaction will be confirmed automatically. If
 	 *            false, the transaction will have to be confirmed with a call
 	 *            to {@link #confirmNotifications(Context, String)}.
+	 * @param developerPayload
+	 *            a developer-specified string that contains supplemental
+	 *            information about the order.
 	 * @see IBillingObserver#onPurchaseIntent(String, PendingIntent)
 	 */
-	public static void requestPurchase(Context context, String itemId,
-			boolean confirm) {
+	public static void requestPurchase(Context context, String itemId, boolean confirm, String developerPayload) {
 		if (confirm) {
 			automaticConfirmations.add(itemId);
 		}
-		BillingService.requestPurchase(context, itemId, null);
+		BillingService.requestPurchase(context, itemId, developerPayload);
 	}
 
 	/**
@@ -585,10 +589,10 @@ public class BillingController {
 	 * @param context
 	 * @param itemId
 	 *            id of the item to be purchased.
-	 * @see #requestSubscription(Context, String, boolean)
+	 * @see #requestSubscription(Context, String, boolean, String)
 	 */
 	public static void requestSubscription(Context context, String itemId) {
-		requestSubscription(context, itemId, false);
+		requestSubscription(context, itemId, false, null);
 	}
 
 	/**
@@ -602,14 +606,16 @@ public class BillingController {
 	 *            if true, the transaction will be confirmed automatically. If
 	 *            false, the transaction will have to be confirmed with a call
 	 *            to {@link #confirmNotifications(Context, String)}.
+	 * @param developerPayload
+	 *            a developer-specified string that contains supplemental
+	 *            information about the order.
 	 * @see IBillingObserver#onPurchaseIntent(String, PendingIntent)
 	 */
-	public static void requestSubscription(Context context, String itemId,
-			boolean confirm) {
+	public static void requestSubscription(Context context, String itemId, boolean confirm, String developerPayload) {
 		if (confirm) {
 			automaticConfirmations.add(itemId);
 		}
-		BillingService.requestSubscription(context, itemId, null);
+		BillingService.requestSubscription(context, itemId, developerPayload);
 	}
 
 	/**
