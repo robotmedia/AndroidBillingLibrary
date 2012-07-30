@@ -33,8 +33,8 @@ public class CatalogEntry {
 	public static final CatalogEntry[] CATALOG = new CatalogEntry[] {
 			new CatalogEntry("sword_001", R.string.two_handed_sword, Managed.MANAGED),
 			new CatalogEntry("potion_001", R.string.potions, Managed.UNMANAGED),
-			new CatalogEntry("subscription_monthly", R.string.subscription_monthly, Managed.UNMANAGED),
-			new CatalogEntry("subscription_yearly", R.string.subscription_yearly, Managed.UNMANAGED),
+			new CatalogEntry("subscription_monthly", R.string.subscription_monthly, Managed.SUBSCRIPTION),
+			new CatalogEntry("subscription_yearly", R.string.subscription_yearly, Managed.SUBSCRIPTION),
 			new CatalogEntry("android.test.purchased", R.string.android_test_purchased, Managed.UNMANAGED),
 			new CatalogEntry("android.test.canceled", R.string.android_test_canceled, Managed.UNMANAGED),
 			new CatalogEntry("android.test.refunded", R.string.android_test_refunded, Managed.UNMANAGED),
