@@ -383,10 +383,12 @@ public class BillingController {
 	 */
 	protected static void onPurchaseStateChanged(Context context, String signedData, String signature) {
 		debug("Purchase state changed");
-
+		
 		if (TextUtils.isEmpty(signedData)) {
 			Log.w(LOG_TAG, "Signed data is empty");
 			return;
+		} else {
+			debug(signedData);
 		}
 
 		if (!debug) {
