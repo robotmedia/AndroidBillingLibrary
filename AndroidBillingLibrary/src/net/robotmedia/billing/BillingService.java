@@ -35,13 +35,13 @@ import android.util.Log;
 public class BillingService extends Service implements ServiceConnection {
 
 	private static enum Action {
-		CHECK_BILLING_SUPPORTED, CONFIRM_NOTIFICATIONS, GET_PURCHASE_INFORMATION, REQUEST_PURCHASE, RESTORE_TRANSACTIONS,
+		CHECK_BILLING_SUPPORTED, CHECK_SUBSCRIPTION_SUPPORTED, CONFIRM_NOTIFICATIONS, GET_PURCHASE_INFORMATION, REQUEST_PURCHASE, RESTORE_TRANSACTIONS
 	}
 
 	private static final String ACTION_MARKET_BILLING_SERVICE = "com.android.vending.billing.MarketBillingService.BIND";
 	private static final String EXTRA_DEVELOPER_PAYLOAD = "DEVELOPER_PAYLOAD";
-
 	private static final String EXTRA_ITEM_ID = "ITEM_ID";
+	private static final String EXTRA_ITEM_TYPE = "ITEM_TYPE";
 	private static final String EXTRA_NONCE = "EXTRA_NONCE";
 	private static final String EXTRA_NOTIFY_IDS = "NOTIFY_IDS";
 	private static LinkedList<BillingRequest> mPendingRequests = new LinkedList<BillingRequest>();
@@ -53,6 +53,11 @@ public class BillingService extends Service implements ServiceConnection {
 		context.startService(intent);
 	}
 
+	public static void checkSubscriptionSupported(Context context) {
+		final Intent intent = createIntent(context, Action.CHECK_SUBSCRIPTION_SUPPORTED);
+		context.startService(intent);
+	}
+	
 	public static void confirmNotifications(Context context, String[] notifyIds) {
 		final Intent intent = createIntent(context, Action.CONFIRM_NOTIFICATIONS);
 		intent.putExtra(EXTRA_NOTIFY_IDS, notifyIds);
@@ -80,6 +85,15 @@ public class BillingService extends Service implements ServiceConnection {
 	public static void requestPurchase(Context context, String itemId, String developerPayload) {
 		final Intent intent = createIntent(context, Action.REQUEST_PURCHASE);
 		intent.putExtra(EXTRA_ITEM_ID, itemId);
+		intent.putExtra(EXTRA_ITEM_TYPE, BillingRequest.ITEM_TYPE_INAPP);
+		intent.putExtra(EXTRA_DEVELOPER_PAYLOAD, developerPayload);
+		context.startService(intent);
+	}
+	
+	public static void requestSubscription(Context context, String itemId, String developerPayload) {
+		final Intent intent = createIntent(context, Action.REQUEST_PURCHASE);
+		intent.putExtra(EXTRA_ITEM_ID, itemId);
+		intent.putExtra(EXTRA_ITEM_TYPE, BillingRequest.ITEM_TYPE_SUBSCRIPTION);
 		intent.putExtra(EXTRA_DEVELOPER_PAYLOAD, developerPayload);
 		context.startService(intent);
 	}
@@ -105,6 +119,12 @@ public class BillingService extends Service implements ServiceConnection {
 	private void checkBillingSupported(int startId) {
 		final String packageName = getPackageName();
 		final CheckBillingSupported request = new CheckBillingSupported(packageName, startId);
+		runRequestOrQueue(request);
+	}
+	
+	private void checkSubscriptionSupported(int startId) {
+		final String packageName = getPackageName();
+		final CheckSubscriptionSupported request = new CheckSubscriptionSupported(packageName, startId);
 		runRequestOrQueue(request);
 	}
 
@@ -141,13 +161,11 @@ public class BillingService extends Service implements ServiceConnection {
 		return null;
 	}
 
-	@Override
 	public void onServiceConnected(ComponentName name, IBinder service) {
 		mService = IMarketBillingService.Stub.asInterface(service);
 		runPendingRequests();
 	}
 
-	@Override
 	public void onServiceDisconnected(ComponentName name) {
 		mService = null;
 	}
@@ -175,6 +193,9 @@ public class BillingService extends Service implements ServiceConnection {
 		case CHECK_BILLING_SUPPORTED:
 			checkBillingSupported(startId);
 			break;
+		case CHECK_SUBSCRIPTION_SUPPORTED:
+			checkSubscriptionSupported(startId);
+			break;
 		case REQUEST_PURCHASE:
 			requestPurchase(intent, startId);
 			break;
@@ -192,8 +213,9 @@ public class BillingService extends Service implements ServiceConnection {
 	private void requestPurchase(Intent intent, int startId) {
 		final String packageName = getPackageName();
 		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
+		final String itemType = intent.getStringExtra(EXTRA_ITEM_TYPE);
 		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
-		final RequestPurchase request = new RequestPurchase(packageName, startId, itemId, developerPayload);
+		final RequestPurchase request = new RequestPurchase(packageName, startId, itemId, itemType, developerPayload);
 		runRequestOrQueue(request);
 	}
 

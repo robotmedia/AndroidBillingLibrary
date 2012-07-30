@@ -41,6 +41,11 @@ public class BillingServiceTest extends ServiceTestCase<BillingService> {
 	public void testCheckBillingSupported() throws Exception {
 		BillingService.checkBillingSupported(getContext());
 	}
+	
+	@SmallTest
+	public void testCheckSubscriptionSupported() throws Exception {
+		BillingService.checkSubscriptionSupported(getContext());
+	}
 
 	@SmallTest
 	public void testConfirmNotifications() throws Exception {
@@ -57,6 +62,11 @@ public class BillingServiceTest extends ServiceTestCase<BillingService> {
 		BillingService.requestPurchase(getContext(), ITEM_ID, null);
 	}	
 
+	@SmallTest
+	public void testRequestSubscription() throws Exception {
+		BillingService.requestSubscription(getContext(), ITEM_ID, null);
+	}
+	
 	@SmallTest
 	public void testRestoreTransactions() throws Exception {
 		BillingService.restoreTransations(getContext(), NONCE);

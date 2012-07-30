@@ -67,7 +67,8 @@ public class BillingController {
 		public String getPublicKey();
 	}
 
-	private static BillingStatus status = BillingStatus.UNKNOWN;
+	private static BillingStatus billingStatus = BillingStatus.UNKNOWN;
+	private static BillingStatus subscriptionStatus = BillingStatus.UNKNOWN;
 
 	private static Set<String> automaticConfirmations = new HashSet<String>();
 	private static IConfiguration configuration = null;
@@ -103,23 +104,61 @@ public class BillingController {
 	}
 
 	/**
-	 * Returns the billing status. If it is currently unknown, checks the
-	 * billing status asynchronously. Observers will receive a
+	 * Returns the in-app product billing support status, and checks it
+	 * asynchronously if it is currently unknown. Observers will receive a
 	 * {@link IBillingObserver#onBillingChecked(boolean)} notification in either
 	 * case.
+	 * <p>
+	 * In-app product support does not imply subscription support. To check if
+	 * subscriptions are supported, use
+	 * {@link BillingController#checkSubscriptionSupported(Context)}.
+	 * </p>
 	 * 
 	 * @param context
-	 * @return the current billing status (unknown, supported or unsupported).
+	 * @return the current in-app product billing support status (unknown,
+	 *         supported or unsupported). If it is unsupported, subscriptions
+	 *         are also unsupported.
 	 * @see IBillingObserver#onBillingChecked(boolean)
+	 * @see BillingController#checkSubscriptionSupported(Context)
 	 */
 	public static BillingStatus checkBillingSupported(Context context) {
-		if (status == BillingStatus.UNKNOWN) {
+		if (billingStatus == BillingStatus.UNKNOWN) {
 			BillingService.checkBillingSupported(context);
 		} else {
-			boolean supported = status == BillingStatus.SUPPORTED;
+			boolean supported = billingStatus == BillingStatus.SUPPORTED;
 			onBillingChecked(supported);
 		}
-		return status;
+		return billingStatus;
+	}
+
+	/**
+	 * <p>
+	 * Returns the subscription billing support status, and checks it
+	 * asynchronously if it is currently unknown. Observers will receive a
+	 * {@link IBillingObserver#onSubscriptionChecked(boolean)} notification in
+	 * either case.
+	 * </p>
+	 * <p>
+	 * No support for subscriptions does not imply that in-app products are also
+	 * unsupported. To check if in-app products are supported, use
+	 * {@link BillingController#checkBillingSupported(Context)}.
+	 * </p>
+	 * 
+	 * @param context
+	 * @return the current subscription billing status (unknown, supported or
+	 *         unsupported). If it is supported, in-app products are also
+	 *         supported.
+	 * @see IBillingObserver#onSubscriptionChecked(boolean)
+	 * @see BillingController#checkBillingSupported(Context)
+	 */
+	public static BillingStatus checkSubscriptionSupported(Context context) {
+		if (subscriptionStatus == BillingStatus.UNKNOWN) {
+			BillingService.checkSubscriptionSupported(context);
+		} else {
+			boolean supported = subscriptionStatus == BillingStatus.SUPPORTED;
+			onSubscriptionChecked(supported);
+		}
+		return subscriptionStatus;
 	}
 
 	/**
@@ -291,7 +330,10 @@ public class BillingController {
 	 * @param supported
 	 */
 	protected static void onBillingChecked(boolean supported) {
-		status = supported ? BillingStatus.SUPPORTED : BillingStatus.UNSUPPORTED;
+		billingStatus = supported ? BillingStatus.SUPPORTED : BillingStatus.UNSUPPORTED;
+		if (billingStatus == BillingStatus.UNSUPPORTED) { // Save us the subscription check
+			subscriptionStatus = BillingStatus.UNSUPPORTED;
+		}
 		for (IBillingObserver o : observers) {
 			o.onBillingChecked(supported);
 		}
@@ -430,6 +472,23 @@ public class BillingController {
 			request.onResponseCode(response);
 		}
 	}
+	
+	/**
+	 * Called after the response to a
+	 * {@link net.robotmedia.billing.request.CheckSubscriptionSupported} request is
+	 * received.
+	 * 
+	 * @param supported
+	 */
+	protected static void onSubscriptionChecked(boolean supported) {
+		subscriptionStatus = supported ? BillingStatus.SUPPORTED : BillingStatus.UNSUPPORTED;
+		if (subscriptionStatus == BillingStatus.SUPPORTED) { // Save us the billing check
+			billingStatus = BillingStatus.SUPPORTED;
+		}
+		for (IBillingObserver o : observers) {
+			o.onSubscriptionChecked(supported);
+		}
+	}
 
 	protected static void onTransactionsRestored() {
 		for (IBillingObserver o : observers) {
@@ -478,6 +537,10 @@ public class BillingController {
 	/**
 	 * Requests the purchase of the specified item. The transaction will not be
 	 * confirmed automatically.
+	 * <p>
+	 * For subscriptions, use {@link #requestSubscription(Context, String)}
+	 * instead.
+	 * </p>
 	 * 
 	 * @param context
 	 * @param itemId
@@ -489,8 +552,14 @@ public class BillingController {
 	}
 
 	/**
+	 * <p>
 	 * Requests the purchase of the specified item with optional automatic
 	 * confirmation.
+	 * </p>
+	 * <p>
+	 * For subscriptions, use
+	 * {@link #requestSubscription(Context, String, boolean)} instead.
+	 * </p>
 	 * 
 	 * @param context
 	 * @param itemId
@@ -501,11 +570,46 @@ public class BillingController {
 	 *            to {@link #confirmNotifications(Context, String)}.
 	 * @see IBillingObserver#onPurchaseIntent(String, PendingIntent)
 	 */
-	public static void requestPurchase(Context context, String itemId, boolean confirm) {
+	public static void requestPurchase(Context context, String itemId,
+			boolean confirm) {
 		if (confirm) {
 			automaticConfirmations.add(itemId);
 		}
 		BillingService.requestPurchase(context, itemId, null);
+	}
+
+	/**
+	 * Requests the purchase of the specified subscription item. The transaction
+	 * will not be confirmed automatically.
+	 * 
+	 * @param context
+	 * @param itemId
+	 *            id of the item to be purchased.
+	 * @see #requestSubscription(Context, String, boolean)
+	 */
+	public static void requestSubscription(Context context, String itemId) {
+		requestSubscription(context, itemId, false);
+	}
+
+	/**
+	 * Requests the purchase of the specified subscription item with optional
+	 * automatic confirmation.
+	 * 
+	 * @param context
+	 * @param itemId
+	 *            id of the item to be purchased.
+	 * @param confirm
+	 *            if true, the transaction will be confirmed automatically. If
+	 *            false, the transaction will have to be confirmed with a call
+	 *            to {@link #confirmNotifications(Context, String)}.
+	 * @see IBillingObserver#onPurchaseIntent(String, PendingIntent)
+	 */
+	public static void requestSubscription(Context context, String itemId,
+			boolean confirm) {
+		if (confirm) {
+			automaticConfirmations.add(itemId);
+		}
+		BillingService.requestSubscription(context, itemId, null);
 	}
 
 	/**

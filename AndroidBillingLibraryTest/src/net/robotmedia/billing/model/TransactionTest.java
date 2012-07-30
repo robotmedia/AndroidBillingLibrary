@@ -69,6 +69,7 @@ public class TransactionTest extends TestCase {
 		assertEquals(Transaction.PurchaseState.PURCHASED.ordinal(), 0);
 		assertEquals(Transaction.PurchaseState.CANCELLED.ordinal(), 1);
 		assertEquals(Transaction.PurchaseState.REFUNDED.ordinal(), 2);
+		assertEquals(Transaction.PurchaseState.EXPIRED.ordinal(), 3);
 	}
 	
 	@SmallTest
