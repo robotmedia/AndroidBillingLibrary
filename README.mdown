@@ -41,7 +41,7 @@ Usage
 Subclassing AbstractBillingActivity
 -----------------------------------
 
-[AbstractBillingActivity][2] is an abstract activity that provides default integration with in-app billing. It is useful to get acquainted with the library, or for very simple applications that require in-app billing integration in only one activity. For more flexibility use [BillingController][3] directly instead.
+[AbstractBillingActivity][2] is an abstract activity that provides default integration with in-app billing (an analogous class for fragments is also provided). It is useful to get acquainted with the library, or for very simple applications that require in-app billing integration in only one activity. For more flexibility use [BillingController][3] directly.
 
 When created your [AbstractBillingActivity][2] instance will check if in-app billing is supported, followed by a call to `onBillingChecked(boolean)`, which has to be implemented by the subclass.
 
@@ -63,7 +63,7 @@ Additionally, [BillingController][3] requires a `BillingController.IConfiguratio
 Dungeons Redux
 ==============
 
-[Dungeons Redux][5] is a sample app that shows how to use *Android Billing Library* through [BillingController][3]. It is a simplified version of the Dungeons in-app billing example provided by Google.
+[Dungeons Redux][5] is a sample app that shows how to use *Android Billing Library* via [BillingController][3]. It is a simplified version of the Dungeons in-app billing example provided by Google.
 
 It should be noted that Dungeons Redux does not intend to be an example of how to use in-app billing in general.
 

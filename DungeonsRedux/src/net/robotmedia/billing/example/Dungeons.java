@@ -144,9 +144,9 @@ public class Dungeons extends Activity {
 
 			public void onClick(View v) {
 				if (mSelectedItem.managed != Managed.SUBSCRIPTION) {
-					BillingController.requestPurchase(Dungeons.this, mSelectedItem.sku, true /* confirm */);
+					BillingController.requestPurchase(Dungeons.this, mSelectedItem.sku, true /* confirm */, null);
 				} else {
-					BillingController.requestSubscription(Dungeons.this, mSelectedItem.sku, true /* confirm */);
+					BillingController.requestSubscription(Dungeons.this, mSelectedItem.sku, true /* confirm */, null);
 				}
 			}
 		});
