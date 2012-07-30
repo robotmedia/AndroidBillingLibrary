@@ -19,13 +19,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.robotmedia.billing.BillingController.BillingStatus;
 import net.robotmedia.billing.BillingRequest.ResponseCode;
+import net.robotmedia.billing.helper.MockBillingObserver;
 import net.robotmedia.billing.model.BillingDB;
 import net.robotmedia.billing.model.BillingDBTest;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionTest;
-import net.robotmedia.billing.model.Transaction.PurchaseState;
-import android.app.PendingIntent;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -49,6 +49,11 @@ public class BillingControllerTest extends AndroidTestCase {
 	@SmallTest
 	public void testCheckBillingSupported() throws Exception {
 		BillingController.checkBillingSupported(getContext());
+	}
+	
+	@SmallTest
+	public void testCheckSubscriptionSupported() throws Exception {
+		BillingController.checkSubscriptionSupported(getContext());
 	}
 	
 	@MediumTest
@@ -98,14 +103,11 @@ public class BillingControllerTest extends AndroidTestCase {
 	@SmallTest
 	public void testOnTransactionRestored() throws Exception {
 		final Set<Boolean> flags = new HashSet<Boolean>();
-		final IBillingObserver observer = new IBillingObserver() {
+		final IBillingObserver observer = new MockBillingObserver() {
+			@Override
 			public void onTransactionsRestored() {
 				flags.add(true);
 			}
-			public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {}
-			public void onBillingChecked(boolean supported) {}
-			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {}
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onTransactionsRestored();
@@ -118,22 +120,83 @@ public class BillingControllerTest extends AndroidTestCase {
 		final String testItemId = TransactionTest.TRANSACTION_1.productId;
 		final ResponseCode testResponse = ResponseCode.RESULT_OK;
 		final Set<Boolean> flags = new HashSet<Boolean>();
-		final IBillingObserver observer = new IBillingObserver() {
-			
-			public void onTransactionsRestored() {}
-			public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {}
-			public void onBillingChecked(boolean supported) {}
+		final IBillingObserver observer = new MockBillingObserver() {
+			@Override
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) { 
 				flags.add(true);
 				assertEquals(testItemId, itemId);
 				assertEquals(testResponse, response);
 			}
-			@Override
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) {}
 		};
 		BillingController.registerObserver(observer);
 		BillingController.onRequestPurchaseResponse(testItemId, testResponse);
 		assertEquals(flags.size(), 1);
+		BillingController.unregisterObserver(observer);
+	}
+	
+	public void testOnBillingCheckedSupportedTrue() throws Exception {
+		final Set<Boolean> flags = new HashSet<Boolean>();
+		final IBillingObserver observer = new MockBillingObserver() {
+			@Override
+			public void onBillingChecked(boolean supported) {
+				flags.add(true);
+				assertTrue(supported);
+			}
+		};
+		BillingController.registerObserver(observer);
+		BillingController.onBillingChecked(true);
+		assertEquals(flags.size(), 1);
+		assertEquals(BillingController.checkBillingSupported(getContext()), BillingStatus.SUPPORTED);
+		BillingController.unregisterObserver(observer);
+	}
+	
+	public void testOnBillingCheckedSupportedFalse() throws Exception {
+		final Set<Boolean> flags = new HashSet<Boolean>();
+		final IBillingObserver observer = new MockBillingObserver() {
+			@Override
+			public void onBillingChecked(boolean supported) {
+				flags.add(true);
+				assertFalse(supported);
+			}
+		};
+		BillingController.registerObserver(observer);
+		BillingController.onBillingChecked(false);
+		assertEquals(flags.size(), 1);
+		assertEquals(BillingController.checkBillingSupported(getContext()), BillingStatus.UNSUPPORTED);
+		assertEquals(BillingController.checkSubscriptionSupported(getContext()), BillingStatus.UNSUPPORTED);
+		BillingController.unregisterObserver(observer);
+	}
+	
+	public void testOnSubscriptionCheckedSupportedTrue() throws Exception {
+		final Set<Boolean> flags = new HashSet<Boolean>();
+		final IBillingObserver observer = new MockBillingObserver() {
+			@Override
+			public void onSubscriptionChecked(boolean supported) {
+				flags.add(true);
+				assertTrue(supported);
+			}
+		};
+		BillingController.registerObserver(observer);
+		BillingController.onSubscriptionChecked(true);
+		assertEquals(flags.size(), 1);
+		assertEquals(BillingController.checkBillingSupported(getContext()), BillingStatus.SUPPORTED);
+		assertEquals(BillingController.checkSubscriptionSupported(getContext()), BillingStatus.SUPPORTED);
+		BillingController.unregisterObserver(observer);
+	}
+	
+	public void testOnSubscriptionCheckedSupportedFalse() throws Exception {
+		final Set<Boolean> flags = new HashSet<Boolean>();
+		final IBillingObserver observer = new MockBillingObserver() {
+			@Override
+			public void onSubscriptionChecked(boolean supported) {
+				flags.add(true);
+				assertFalse(supported);
+			}
+		};
+		BillingController.registerObserver(observer);
+		BillingController.onSubscriptionChecked(false);
+		assertEquals(flags.size(), 1);
+		assertEquals(BillingController.checkSubscriptionSupported(getContext()), BillingStatus.UNSUPPORTED);
 		BillingController.unregisterObserver(observer);
 	}
 }

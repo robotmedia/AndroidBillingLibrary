@@ -23,6 +23,7 @@ import net.robotmedia.billing.BillingRequest.ResponseCode;
 import net.robotmedia.billing.example.R;
 import net.robotmedia.billing.example.auxiliary.CatalogAdapter;
 import net.robotmedia.billing.example.auxiliary.CatalogEntry;
+import net.robotmedia.billing.example.auxiliary.CatalogEntry.Managed;
 import net.robotmedia.billing.helper.AbstractBillingObserver;
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.Transaction.PurchaseState;
@@ -41,7 +42,7 @@ public class Dungeons extends Activity {
 
 	private static final int DIALOG_BILLING_NOT_SUPPORTED_ID = 2;
 
-	private String mSku;
+	private CatalogEntry mSelectedItem;
 
 	private CatalogAdapter mCatalogAdapter;
 
@@ -68,20 +69,22 @@ public class Dungeons extends Activity {
 		super.onCreate(savedInstanceState);
 		mBillingObserver = new AbstractBillingObserver(this) {
 
-			@Override
 			public void onBillingChecked(boolean supported) {
 				Dungeons.this.onBillingChecked(supported);
 			}
 
-			@Override
 			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
 				Dungeons.this.onPurchaseStateChanged(itemId, state);
 			}
 
-			@Override
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
 				Dungeons.this.onRequestPurchaseResponse(itemId, response);
 			}
+
+			public void onSubscriptionChecked(boolean supported) {
+				Dungeons.this.onSubscriptionChecked(supported);
+			}
+		
 		};
 		
 		setContentView(R.layout.main);
@@ -89,6 +92,7 @@ public class Dungeons extends Activity {
 		setupWidgets();
 		BillingController.registerObserver(mBillingObserver);
 		BillingController.checkBillingSupported(this);
+		BillingController.checkSubscriptionSupported(this);
 		updateOwnedItems();
 	}
 
@@ -115,6 +119,10 @@ public class Dungeons extends Activity {
 
 	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
 	}
+	
+	public void onSubscriptionChecked(boolean supported) {
+		
+	}
 
 	/**
 	 * Restores previous transactions, if any. This happens if the application
@@ -134,9 +142,12 @@ public class Dungeons extends Activity {
 		mBuyButton.setEnabled(false);
 		mBuyButton.setOnClickListener(new OnClickListener() {
 
-			@Override
 			public void onClick(View v) {
-				BillingController.requestPurchase(Dungeons.this, mSku, true /* confirm */);
+				if (mSelectedItem.managed != Managed.SUBSCRIPTION) {
+					BillingController.requestPurchase(Dungeons.this, mSelectedItem.sku, true /* confirm */);
+				} else {
+					BillingController.requestSubscription(Dungeons.this, mSelectedItem.sku, true /* confirm */);
+				}
 			}
 		});
 
@@ -146,7 +157,7 @@ public class Dungeons extends Activity {
 		mSelectItemSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				mSku = CatalogEntry.CATALOG[position].sku;
+				mSelectedItem = CatalogEntry.CATALOG[position];
 			}
 
 			public void onNothingSelected(AdapterView<?> arg0) {

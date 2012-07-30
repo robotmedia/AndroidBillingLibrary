@@ -22,8 +22,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:paddingLeft="4dip"
-    android:paddingRight="4dip"
-    android:background="@color/screen_background">
+    android:paddingRight="4dip">
 
     <TextView
         android:id="@+id/billing_supported"
@@ -35,7 +34,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dip"
-        android:textColor="@android:color/black"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold"
         android:text="@string/items_for_sale" />
@@ -60,7 +58,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dip"
-        android:textColor="@android:color/black"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold"
         android:text="@string/items_you_own" />

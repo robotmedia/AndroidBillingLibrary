@@ -38,6 +38,11 @@ public class AbstractBillingActivityTest extends ActivityInstrumentationTestCase
 	public void testCheckBillingSupported() throws Exception {
 		mActivity.checkBillingSupported();
 	}
+	
+	@MediumTest
+	public void testCheckSubscriptionSupported() throws Exception {
+		mActivity.checkSubscriptionSupported();
+	}
 
 	// TODO: Find a way to test the following without hanging the test suite
 	// @SmallTest

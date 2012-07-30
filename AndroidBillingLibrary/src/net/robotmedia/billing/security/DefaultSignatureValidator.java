@@ -89,7 +89,6 @@ public class DefaultSignatureValidator implements ISignatureValidator {
 		return false;
 	}
 
-	@Override
 	public boolean validate(String signedData, String signature) {
 		final String publicKey;
 		if (configuration == null || TextUtils.isEmpty(publicKey = configuration.getPublicKey())) {

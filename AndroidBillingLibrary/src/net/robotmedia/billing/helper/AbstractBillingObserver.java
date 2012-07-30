@@ -53,12 +53,10 @@ public abstract class AbstractBillingObserver implements IBillingObserver {
 	 * @param purchaseIntent
 	 *            a purchase pending intent for the specified item.
 	 */
-	@Override
 	public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {
 		BillingController.startPurchaseIntent(activity, purchaseIntent, null);
 	}
 
-	@Override
 	public void onTransactionsRestored() {
 		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
 		final Editor editor = preferences.edit();

@@ -21,10 +21,14 @@ import org.json.JSONObject;
 public class Transaction {
 
     public enum PurchaseState {
-        // Responses to requestPurchase or restoreTransactions.
-    	PURCHASED,    // 0: User was charged for the order.
-        CANCELLED,   // 1: The charge failed on the server.
-    	REFUNDED;    // 2: User received a refund for the order.
+		// Responses to requestPurchase or restoreTransactions.
+		PURCHASED, // 0: User was charged for the order.
+		CANCELLED, // 1: The charge failed on the server.
+		REFUNDED, // 2: User received a refund for the order.
+		EXPIRED; // 3: Sent at the end of a billing cycle to indicate that the
+					// subscription expired without renewal because of
+					// non-payment or user-cancellation. Your app does not need
+					// to grant continued access to the subscription content.
 
         // Converts from an ordinal value to the PurchaseState
         public static PurchaseState valueOf(int index) {
