@@ -274,9 +274,8 @@ public class BillingController {
 
 	/**
 	 * Returns true if the specified item has been registered as purchased in
-	 * local memory. Note that if the item was later canceled or refunded this
-	 * will still return true. Also note that the item might have been purchased
-	 * in another installation, but not yet registered in this one.
+	 * local memory, false otherwise. Also note that the item might have been
+	 * purchased in another installation, but not yet registered in this one.
 	 * 
 	 * @param context
 	 * @param itemId
