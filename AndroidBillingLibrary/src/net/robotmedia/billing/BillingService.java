@@ -195,6 +195,7 @@ public class BillingService extends Service implements ServiceConnection {
 			break;
 		case REQUEST_PURCHASE:
 			requestPurchase(intent, startId);
+			break;
 		case REQUEST_SUBSCRIPTION:
 			requestSubscription(intent, startId);
 			break;
