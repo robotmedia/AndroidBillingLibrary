@@ -1,6 +1,6 @@
 package net.robotmedia.billing.example.auxiliary;
 
-import net.robotmedia.billing.example.R;
+import net.robotmedia.billing.dungeons.redux.R;
 
 public class CatalogEntry {
 	

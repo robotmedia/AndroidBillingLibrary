@@ -23,11 +23,6 @@ import android.util.Log;
 import com.android.vending.billing.IMarketBillingService;
 
 public abstract class BillingRequest {
-
-	public static final String ITEM_TYPE_INAPP = "inapp";
-	public static final String ITEM_TYPE_SUBSCRIPTION = "subs";
-    private static final String KEY_ITEM_TYPE = "ITEM_TYPE";
-	private static final String REQUEST_TYPE_CHECK_BILLING_SUPPORTED = "CHECK_BILLING_SUPPORTED";
 	
 	public static class CheckBillingSupported extends BillingRequest {
 		
@@ -49,12 +44,15 @@ public abstract class BillingRequest {
     }
 	
 	public static class CheckSubscriptionSupported extends BillingRequest {
-
-		private static final String KEY_API_VERSION = "API_VERSION";
 		
 	    public CheckSubscriptionSupported(String packageName, int startId) {
 			super(packageName, startId);
 		}
+	    
+	    @Override
+	    protected int getAPIVersion() {
+	    	return 2;
+	    };
 	    
     	@Override
     	public String getRequestType() {
@@ -69,7 +67,6 @@ public abstract class BillingRequest {
 		
     	@Override
     	protected void addParams(Bundle request) {
-    		request.putInt(KEY_API_VERSION, 2);
     		request.putString(KEY_ITEM_TYPE, ITEM_TYPE_SUBSCRIPTION);
     	}
     	
@@ -121,27 +118,25 @@ public abstract class BillingRequest {
     	@Override public boolean hasNonce() { return true; }
     	
     }
+
     public static class RequestPurchase extends BillingRequest {
 
     	private String itemId;
-    	private String itemType;
     	private String developerPayload;
     	
     	private static final String KEY_ITEM_ID = "ITEM_ID";
     	private static final String KEY_DEVELOPER_PAYLOAD = "DEVELOPER_PAYLOAD";
     	private static final String KEY_PURCHASE_INTENT = "PURCHASE_INTENT";
     	
-    	public RequestPurchase(String packageName, int startId, String itemId, String itemType, String developerPayload) {
+    	public RequestPurchase(String packageName, int startId, String itemId, String developerPayload) {
     		super(packageName, startId);
     		this.itemId = itemId;
-    		this.itemType = itemType;
     		this.developerPayload = developerPayload;
     	}
 
     	@Override
     	protected void addParams(Bundle request) {
     		request.putString(KEY_ITEM_ID, itemId);
-    		request.putString(KEY_ITEM_TYPE, itemType);
     		if (developerPayload != null) {
     			request.putString(KEY_DEVELOPER_PAYLOAD, developerPayload);
     		}
@@ -163,9 +158,27 @@ public abstract class BillingRequest {
     		final PendingIntent purchaseIntent = response.getParcelable(KEY_PURCHASE_INTENT);
     		BillingController.onPurchaseIntent(itemId, purchaseIntent);
     	}
-
     	
     }
+    
+    public static class RequestSubscription extends RequestPurchase {
+
+    	public RequestSubscription(String packageName, int startId, String itemId, String developerPayload) {
+			super(packageName, startId, itemId, developerPayload);
+		}
+
+		@Override
+    	protected void addParams(Bundle request) {
+			super.addParams(request);
+    		request.putString(KEY_ITEM_TYPE, ITEM_TYPE_SUBSCRIPTION);
+    	}
+    	
+    	@Override
+    	protected int getAPIVersion() {
+    		return 2;
+    	}
+    }
+    
     public static enum ResponseCode {
     	RESULT_OK, // 0
     	RESULT_USER_CANCELED, // 1 
@@ -210,15 +223,16 @@ public abstract class BillingRequest {
     	}
     	
     }
+
+	public static final String ITEM_TYPE_SUBSCRIPTION = "subs";
+	private static final String KEY_API_VERSION = "API_VERSION";	
     private static final String KEY_BILLING_REQUEST = "BILLING_REQUEST";
-	
-    private static final String KEY_API_VERSION = "API_VERSION";
-    private static final String KEY_PACKAGE_NAME = "PACKAGE_NAME";
-    private static final String KEY_RESPONSE_CODE = "RESPONSE_CODE";
-    
-    protected static final String KEY_REQUEST_ID = "REQUEST_ID";
-        
+	private static final String KEY_ITEM_TYPE = "ITEM_TYPE";
     private static final String KEY_NONCE = "NONCE";
+	private static final String KEY_PACKAGE_NAME = "PACKAGE_NAME";
+    protected static final String KEY_REQUEST_ID = "REQUEST_ID";
+	private static final String KEY_RESPONSE_CODE = "RESPONSE_CODE";
+	private static final String REQUEST_TYPE_CHECK_BILLING_SUPPORTED = "CHECK_BILLING_SUPPORTED";
     
     public static final long IGNORE_REQUEST_ID = -1;
 	private String packageName;	
@@ -233,6 +247,10 @@ public abstract class BillingRequest {
     
 	protected void addParams(Bundle request) {
     	// Do nothing by default
+    }
+	
+    protected int getAPIVersion() {
+    	return 1;
     }
 
     public long getNonce() {
@@ -252,7 +270,7 @@ public abstract class BillingRequest {
     protected Bundle makeRequestBundle() {
         final Bundle request = new Bundle();
         request.putString(KEY_BILLING_REQUEST, getRequestType());
-        request.putInt(KEY_API_VERSION, 1);
+        request.putInt(KEY_API_VERSION, getAPIVersion());
         request.putString(KEY_PACKAGE_NAME, packageName);
         if (hasNonce()) {
     		request.putLong(KEY_NONCE, nonce);
