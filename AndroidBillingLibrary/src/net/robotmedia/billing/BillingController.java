@@ -37,6 +37,7 @@ import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -60,9 +61,12 @@ public class BillingController {
 
 		/**
 		 * Returns the public key used to verify the signature of responses of
-		 * the Market Billing service.
+		 * the Google Play Billing service. If you are using a custom signature
+		 * validator with server-side validation this method might not be needed
+		 * and can return null.
 		 * 
 		 * @return Base64 encoded public key.
+		 * @see BillingController#setSignatureValidator(ISignatureValidator)
 		 */
 		public String getPublicKey();
 	}
@@ -372,8 +376,8 @@ public class BillingController {
 	/**
 	 * Called after the response to a
 	 * {@link net.robotmedia.billing.request.GetPurchaseInformation} request is
-	 * received. Registers all transactions in local memory and confirms those
-	 * who can be confirmed automatically.
+	 * received. Validates the signature asynchronously and calls
+	 * {@link #onSignatureValidated(Context, String)} if successful.
 	 * 
 	 * @param context
 	 * @param signedData
@@ -381,7 +385,7 @@ public class BillingController {
 	 * @param signature
 	 *            data signature.
 	 */
-	protected static void onPurchaseStateChanged(Context context, String signedData, String signature) {
+	protected static void onPurchaseStateChanged(final Context context, final String signedData, final String signature) {
 		debug("Purchase state changed");
 		
 		if (TextUtils.isEmpty(signedData)) {
@@ -391,19 +395,49 @@ public class BillingController {
 			debug(signedData);
 		}
 
-		if (!debug) {
-			if (TextUtils.isEmpty(signature)) {
-				Log.w(LOG_TAG, "Empty signature requires debug mode");
-				return;
-			}
-			final ISignatureValidator validator = BillingController.validator != null ? BillingController.validator
-					: new DefaultSignatureValidator(BillingController.configuration);
-			if (!validator.validate(signedData, signature)) {
-				Log.w(LOG_TAG, "Signature does not match data.");
-				return;
-			}
+		if (debug) {
+			onSignatureValidated(context, signedData);
+			return;
 		}
+		
+		if (TextUtils.isEmpty(signature)) {
+			Log.w(LOG_TAG, "Empty signature requires debug mode");
+			return;
+		}
+		final ISignatureValidator validator = BillingController.validator != null ? BillingController.validator
+				: new DefaultSignatureValidator(BillingController.configuration);
 
+		// Use AsyncTask mostly in case the signature is validated remotely
+		new AsyncTask<Void, Void, Boolean>() {
+
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				return validator.validate(signedData, signature);
+			}
+
+			@Override
+			protected void onPostExecute(Boolean result) {
+				if (result) {
+					onSignatureValidated(context, signedData);
+				} else {
+					Log.w(LOG_TAG, "Signature does not match data.");
+				}
+			}
+
+		}.execute();
+	}
+	
+	/**
+	 * Called after the signature of a response to a
+	 * {@link net.robotmedia.billing.request.GetPurchaseInformation} request has
+	 * been validated. Registers all transactions in local memory and confirms
+	 * those who can be confirmed automatically.
+	 * 
+	 * @param context
+	 * @param signedData
+	 *            signed JSON data received from the Market Billing service.
+	 */
+	private static void onSignatureValidated(Context context, String signedData) {
 		List<Transaction> purchases;
 		try {
 			JSONObject jObject = new JSONObject(signedData);
@@ -432,7 +466,7 @@ public class BillingController {
 		if (!confirmations.isEmpty()) {
 			final String[] notifyIds = confirmations.toArray(new String[confirmations.size()]);
 			confirmNotifications(context, notifyIds);
-		}
+		}		
 	}
 
 	/**
