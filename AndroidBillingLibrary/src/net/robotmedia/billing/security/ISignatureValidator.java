@@ -25,7 +25,8 @@ public interface ISignatureValidator {
 	 *            signed data
 	 * @param signature
 	 *            signature
-	 * @return true if the data and signature match, false otherwise.
+	 * @return true if the data and signature match, false otherwise or if there
+	 *         was an error during validation.
 	 */
 	public boolean validate(String signedData, String signature);
 

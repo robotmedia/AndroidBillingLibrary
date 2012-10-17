@@ -422,7 +422,7 @@ public class BillingController {
 				if (result) {
 					onSignatureValidated(context, signedData, signature);
 				} else {
-					Log.w(LOG_TAG, "Signature does not match data.");
+					Log.w(LOG_TAG, "Validation failed");
 				}
 			}
 
