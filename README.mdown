@@ -14,6 +14,8 @@ Getting Started
 
 * Get acquainted with the [Android In-app Billing][1] documentation.
 
+* No, really. Read the [documentation first][1]. This library saves you from writing code, but not from reading the documentation.
+
 * Add *Android Billing Library* to your project.
 
 * Open the *AndroidManifest.xml* of your application and add this permission...
