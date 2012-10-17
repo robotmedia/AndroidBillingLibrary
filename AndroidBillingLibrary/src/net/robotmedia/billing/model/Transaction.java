@@ -75,17 +75,6 @@ public class Transaction {
     public Transaction() {}
     
     public Transaction(String orderId, String productId, String packageName, PurchaseState purchaseState,
-			String notificationId, long purchaseTime, String developerPayload) {
-		this.orderId = orderId;
-		this.productId = productId;
-		this.packageName = packageName;
-		this.purchaseState = purchaseState;
-		this.notificationId = notificationId;
-		this.purchaseTime = purchaseTime;
-		this.developerPayload = developerPayload;
-	}
-    
-    public Transaction(String orderId, String productId, String packageName, PurchaseState purchaseState,
 			String notificationId, long purchaseTime, String developerPayload, String signature, String signedData) {
 		this.orderId = orderId;
 		this.productId = productId;
@@ -140,19 +129,16 @@ public class Transaction {
 			return false;
 		if (purchaseTime != other.purchaseTime)
 			return false;
-		
 		if (signature == null) {
 			if (other.signature != null)
 				return false;
 		} else if (!signature.equals(other.signature))
 			return false;
-		
 		if (signedData == null) {
 			if (other.signedData != null)
 				return false;
 		} else if (!signedData.equals(other.signedData))
 			return false;
-		
 		return true;
 	}
 	
