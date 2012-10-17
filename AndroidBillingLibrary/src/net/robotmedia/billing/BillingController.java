@@ -580,11 +580,10 @@ public class BillingController {
 	}
 
 	/**
-	 * Requests the purchase of the specified item. The transaction will not be
-	 * confirmed automatically.
+	 * Requests the purchase of the specified item. The transaction will be
+	 * confirmed automatically. If manual confirmation or a developer payload are required use {@link #requestPurchase(Context, String, boolean, String)} instead.
 	 * <p>
-	 * For subscriptions, use {@link #requestSubscription(Context, String)}
-	 * instead.
+	 * For subscriptions, use {@link #requestSubscription(Context, String)}.
 	 * </p>
 	 * 
 	 * @param context
@@ -593,7 +592,7 @@ public class BillingController {
 	 * @see #requestPurchase(Context, String, boolean)
 	 */
 	public static void requestPurchase(Context context, String itemId) {
-		requestPurchase(context, itemId, false, null);
+		requestPurchase(context, itemId, true /* confirm */, null);
 	}
 
 	/**
@@ -626,8 +625,8 @@ public class BillingController {
 	}
 
 	/**
-	 * Requests the purchase of the specified subscription item. The transaction
-	 * will not be confirmed automatically.
+	 * Requests the purchase of the specified subscription item. The transaction will be
+	 * confirmed automatically. If manual confirmation or a developer payload are required use {@link #requestSubscription(Context, String, boolean, String)} instead.
 	 * 
 	 * @param context
 	 * @param itemId
@@ -635,7 +634,7 @@ public class BillingController {
 	 * @see #requestSubscription(Context, String, boolean, String)
 	 */
 	public static void requestSubscription(Context context, String itemId) {
-		requestSubscription(context, itemId, false, null);
+		requestSubscription(context, itemId, true /* confirm */, null);
 	}
 
 	/**
