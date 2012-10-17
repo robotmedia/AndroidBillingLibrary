@@ -25,26 +25,39 @@ import junit.framework.TestCase;
 
 public class TransactionTest extends TestCase {
 	
-	public static final Transaction TRANSACTION_1 = new Transaction("order1", "android.test.purchased", "com.example", Transaction.PurchaseState.PURCHASED, "notificationId", new Date().getTime(), "developerPayload");
-	public static final Transaction TRANSACTION_2 = new Transaction("order2", "product_2", "com.example", Transaction.PurchaseState.PURCHASED, "notificationId", new Date().getTime(), "developerPayload");
-	public static final Transaction TRANSACTION_2_REFUNDED = new Transaction("order4", "product_2", "com.example", Transaction.PurchaseState.REFUNDED, "notificationId", new Date().getTime(), "developerPayload");
-	public static final Transaction TRANSACTION_1_REFUNDED = new Transaction("order3", "android.test.purchased", "com.example", Transaction.PurchaseState.REFUNDED, "notificationId", new Date().getTime(), "developerPayload");
+	public static final Transaction TRANSACTION_1 = new Transaction("order1", "android.test.purchased", "com.example", Transaction.PurchaseState.PURCHASED, "notificationId", new Date().getTime(), "developerPayload", "signature", "signedData");
+	public static final Transaction TRANSACTION_2 = new Transaction("order2", "product_2", "com.example", Transaction.PurchaseState.PURCHASED, "notificationId", new Date().getTime(), "developerPayload", "signature", "signedData");
+	public static final Transaction TRANSACTION_2_REFUNDED = new Transaction("order4", "product_2", "com.example", Transaction.PurchaseState.REFUNDED, "notificationId", new Date().getTime(), "developerPayload", "signature", "signedData");
+	public static final Transaction TRANSACTION_1_REFUNDED = new Transaction("order3", "android.test.purchased", "com.example", Transaction.PurchaseState.REFUNDED, "notificationId", new Date().getTime(), "developerPayload", "signature", "signedData");
 	public static void assertEquals(Transaction a, Transaction b) {
 		assertTrue(a.equals(b));
 	}
 	
+	private void testParseAllFields(Transaction transaction) throws Exception {
+		JSONObject json = new JSONObject();
+		json.put(Transaction.ORDER_ID, transaction.orderId);
+		json.put(Transaction.PRODUCT_ID, transaction.productId);
+		json.put(Transaction.PACKAGE_NAME, transaction.packageName);
+		json.put(Transaction.PURCHASE_STATE, transaction.purchaseState.ordinal());
+		json.put(Transaction.NOTIFICATION_ID, transaction.notificationId);
+		json.put(Transaction.PURCHASE_TIME, transaction.purchaseTime);
+		json.put(Transaction.DEVELOPER_PAYLOAD, transaction.developerPayload);
+		final Transaction parsed = Transaction.parse(json);
+		assertEquals(transaction.orderId, parsed.orderId);
+		assertEquals(transaction.productId, parsed.productId);
+		assertEquals(transaction.packageName, parsed.packageName);
+		assertEquals(transaction.purchaseState, parsed.purchaseState);
+		assertEquals(transaction.notificationId, parsed.notificationId);
+		assertEquals(transaction.purchaseTime, parsed.purchaseTime);
+		assertEquals(transaction.developerPayload, parsed.developerPayload);
+		assertNull(parsed.signature);
+		assertNull(parsed.signedData);
+	}
+	
 	@SmallTest
 	public void testParseAllFields() throws Exception {
-		JSONObject json = new JSONObject();
-		json.put(Transaction.ORDER_ID, TRANSACTION_1.orderId);
-		json.put(Transaction.PRODUCT_ID, TRANSACTION_1.productId);
-		json.put(Transaction.PACKAGE_NAME, TRANSACTION_1.packageName);
-		json.put(Transaction.PURCHASE_STATE, TRANSACTION_1.purchaseState.ordinal());
-		json.put(Transaction.NOTIFICATION_ID, TRANSACTION_1.notificationId);
-		json.put(Transaction.PURCHASE_TIME, TRANSACTION_1.purchaseTime);
-		json.put(Transaction.DEVELOPER_PAYLOAD, TRANSACTION_1.developerPayload);
-		final Transaction parsed = Transaction.parse(json);
-		assertEquals(TRANSACTION_1, parsed);
+		testParseAllFields(TRANSACTION_1);
+		testParseAllFields(TRANSACTION_2);
 	}
 	
 	@SmallTest
@@ -62,6 +75,8 @@ public class TransactionTest extends TestCase {
 		assertNull(parsed.notificationId);
 		assertEquals(TRANSACTION_1.purchaseTime, parsed.purchaseTime);
 		assertNull(parsed.developerPayload);
+		assertNull(parsed.signature);
+		assertNull(parsed.signedData);
 	}
 	
 	@SmallTest
@@ -76,11 +91,14 @@ public class TransactionTest extends TestCase {
 	public void testEquals() throws Exception {
 		assertTrue(TRANSACTION_1.equals(TRANSACTION_1));
 		assertTrue(TRANSACTION_1.equals(TRANSACTION_1.clone()));
-		assertFalse(TRANSACTION_1.equals(TRANSACTION_2_REFUNDED));
+		assertTrue(TRANSACTION_1.clone().equals(TRANSACTION_1));
+		assertFalse(TRANSACTION_1.equals(TRANSACTION_2));
+		assertFalse(TRANSACTION_2.equals(TRANSACTION_1));
 	}
 	
 	@SmallTest
 	public void testClone() throws Exception {
 		assertEquals(TRANSACTION_1, TRANSACTION_1.clone());
+		assertEquals(TRANSACTION_2, TRANSACTION_2.clone());
 	}
 }
