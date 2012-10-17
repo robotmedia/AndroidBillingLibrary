@@ -76,8 +76,8 @@ public abstract class AbstractBillingFragment extends Fragment implements Billin
 				AbstractBillingFragment.this.onSubscriptionChecked(supported);
 			}
 
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
-				AbstractBillingFragment.this.onPurchaseStateChanged(itemId, state);
+			public void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId) {
+				AbstractBillingFragment.this.onPurchaseStateChanged(itemId, state, orderId);
 			}
 
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
@@ -103,7 +103,7 @@ public abstract class AbstractBillingFragment extends Fragment implements Billin
 		BillingController.setConfiguration(null);
 	}
 
-	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state);;
+	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId);
 
 	public abstract void onRequestPurchaseResponse(String itemId, ResponseCode response);
 

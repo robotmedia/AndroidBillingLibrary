@@ -89,8 +89,8 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 				AbstractBillingActivity.this.onSubscriptionChecked(supported);
 			}
 
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
-				AbstractBillingActivity.this.onPurchaseStateChanged(itemId, state);
+			public void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId) {
+				AbstractBillingActivity.this.onPurchaseStateChanged(itemId, state, orderId);
 			}
 
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
@@ -116,7 +116,7 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 		BillingController.setConfiguration(null);
 	}
 
-	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state);;
+	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId);
 
 	public abstract void onRequestPurchaseResponse(String itemId, ResponseCode response);
 

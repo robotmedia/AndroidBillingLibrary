@@ -300,9 +300,9 @@ public class BillingController {
 	 * @param state
 	 *            new purchase state of the item.
 	 */
-	private static void notifyPurchaseStateChange(String itemId, Transaction.PurchaseState state) {
+	private static void notifyPurchaseStateChange(String itemId, Transaction.PurchaseState state, String orderId) {
 		for (IBillingObserver o : observers) {
-			o.onPurchaseStateChanged(itemId, state);
+			o.onPurchaseStateChanged(itemId, state, orderId);
 		}
 	}
 
@@ -470,7 +470,7 @@ public class BillingController {
 			p.signature = signature;
 			
 			storeTransaction(context, p);
-			notifyPurchaseStateChange(p.productId, p.purchaseState);
+			notifyPurchaseStateChange(p.productId, p.purchaseState, p.orderId);
 		}
 		if (!confirmations.isEmpty()) {
 			final String[] notifyIds = confirmations.toArray(new String[confirmations.size()]);
