@@ -153,34 +153,6 @@ public class BillingService extends Service implements ServiceConnection {
 		runRequestOrQueue(request);
 	}
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
-
-	public void onServiceConnected(ComponentName name, IBinder service) {
-		mService = IMarketBillingService.Stub.asInterface(service);
-		runPendingRequests();
-	}
-
-	public void onServiceDisconnected(ComponentName name) {
-		mService = null;
-	}
-
-	// This is the old onStart method that will be called on the pre-2.0
-	// platform.  On 2.0 or later we override onStartCommand() so this
-	// method will not be called.
-	@Override
-	public void onStart(Intent intent, int startId) {
-	    handleCommand(intent, startId);
-	}
-
-	// @Override // Avoid compile errors on pre-2.0
-	public int onStartCommand(Intent intent, int flags, int startId) {
-	    handleCommand(intent, startId);
-	    return Compatibility.START_NOT_STICKY;
-	}
-	
 	private void handleCommand(Intent intent, int startId) {
 		final Action action = getActionFromIntent(intent);
 		if (action == null) {
@@ -210,50 +182,25 @@ public class BillingService extends Service implements ServiceConnection {
 		}
 	}
 
-	private void requestPurchase(Intent intent, int startId) {
-		final String packageName = getPackageName();
-		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
-		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
-		final RequestPurchase request = new RequestPurchase(packageName, startId, itemId, developerPayload);
-		runRequestOrQueue(request);
-	}
-	
-	private void requestSubscription(Intent intent, int startId) {
-		final String packageName = getPackageName();
-		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
-		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
-		final RequestPurchase request = new RequestSubscription(packageName, startId, itemId, developerPayload);
-		runRequestOrQueue(request);
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
 	}
 
-	private void restoreTransactions(Intent intent, int startId) {
-		final String packageName = getPackageName();
-		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
-		final RestoreTransactions request = new RestoreTransactions(packageName, startId);
-		request.setNonce(nonce);
-		runRequestOrQueue(request);
-	}
-
-	private void runPendingRequests() {
-		BillingRequest request;
-		int maxStartId = -1;		
-		while ((request = mPendingRequests.peek()) != null) {
-			if (runIfConnected(request)) {
-				mPendingRequests.remove();
-				if (maxStartId < request.getStartId()) {
-					maxStartId = request.getStartId();
-				}
-			} else {
-				bindMarketBillingService();
-				return;
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		// Ensure we're not leaking Android Market billing service
+		if (mService != null) {
+			try {
+				unbindService(this);
+			} catch (IllegalArgumentException e) {
+				// This might happen if the service was disconnected
 			}
 		}
-		if (maxStartId >= 0) {
-			stopSelf(maxStartId);
-		}
 	}
-	
-    /**
+
+	/**
      * Called when a remote exception occurs while trying to execute the
      * {@link BillingRequest#run(IMarketBillingService)} method.
      * @param e the exception
@@ -262,6 +209,53 @@ public class BillingService extends Service implements ServiceConnection {
 		Log.w(this.getClass().getSimpleName(), "Remote billing service crashed");
         mService = null;
     }
+
+	public void onServiceConnected(ComponentName name, IBinder service) {
+		mService = IMarketBillingService.Stub.asInterface(service);
+		runPendingRequests();
+	}
+	
+	public void onServiceDisconnected(ComponentName name) {
+		mService = null;
+	}
+
+	// This is the old onStart method that will be called on the pre-2.0
+	// platform.  On 2.0 or later we override onStartCommand() so this
+	// method will not be called.
+	@Override
+	public void onStart(Intent intent, int startId) {
+	    handleCommand(intent, startId);
+	}
+	
+	// @Override // Avoid compile errors on pre-2.0
+	public int onStartCommand(Intent intent, int flags, int startId) {
+	    handleCommand(intent, startId);
+	    return Compatibility.START_NOT_STICKY;
+	}
+
+	private void requestPurchase(Intent intent, int startId) {
+		final String packageName = getPackageName();
+		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
+		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
+		final RequestPurchase request = new RequestPurchase(packageName, startId, itemId, developerPayload);
+		runRequestOrQueue(request);
+	}
+
+	private void requestSubscription(Intent intent, int startId) {
+		final String packageName = getPackageName();
+		final String itemId = intent.getStringExtra(EXTRA_ITEM_ID);
+		final String developerPayload = intent.getStringExtra(EXTRA_DEVELOPER_PAYLOAD);
+		final RequestPurchase request = new RequestSubscription(packageName, startId, itemId, developerPayload);
+		runRequestOrQueue(request);
+	}
+	
+    private void restoreTransactions(Intent intent, int startId) {
+		final String packageName = getPackageName();
+		final long nonce = intent.getLongExtra(EXTRA_NONCE, 0);
+		final RestoreTransactions request = new RestoreTransactions(packageName, startId);
+		request.setNonce(nonce);
+		runRequestOrQueue(request);
+	}
     
     /**
      * Runs the given billing request if the service is already connected.
@@ -281,25 +275,31 @@ public class BillingService extends Service implements ServiceConnection {
         return false;
     }
 	
+	private void runPendingRequests() {
+		BillingRequest request;
+		int maxStartId = -1;		
+		while ((request = mPendingRequests.peek()) != null) {
+			if (runIfConnected(request)) {
+				mPendingRequests.remove();
+				if (maxStartId < request.getStartId()) {
+					maxStartId = request.getStartId();
+				}
+			} else {
+				bindMarketBillingService();
+				return;
+			}
+		}
+		if (maxStartId >= 0) {
+			stopSelf(maxStartId);
+		}
+	}
+	
 	private void runRequestOrQueue(BillingRequest request) {
 		mPendingRequests.add(request);
 		if (mService == null) {			
 			bindMarketBillingService();		
 		} else {
 			runPendingRequests();
-		}
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		// Ensure we're not leaking Android Market billing service
-		if (mService != null) {
-			try {
-				unbindService(this);
-			} catch (IllegalArgumentException e) {
-				// This might happen if the service was disconnected
-			}
 		}
 	}
 
