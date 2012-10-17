@@ -152,14 +152,18 @@ public class BillingDBTest extends AndroidTestCase {
 		assertEquals(found, result);
 	}
 	
+	private void testTable(SQLiteDatabase db, String table) {
+		Cursor cursor = db.query("sqlite_master", new String[] {"name"}, "type='table' AND name='" + table + "'", null, null, null, null);
+		assertTrue(cursor.getCount() > 0);
+		cursor.close();
+	}
+	
 	@SmallTest
 	public void testDatabaseHelperOnCreate() throws Exception {
 		BillingDB.DatabaseHelper helper = new BillingDB.DatabaseHelper(this.getContext());
 		SQLiteDatabase db = SQLiteDatabase.create(null);
 		helper.onCreate(db);
-		Cursor cursor = db.query("sqlite_master", new String[] {"name"}, "type='table' AND name='" + BillingDB.TABLE_TRANSACTIONS + "'", null, null, null, null);
-		assertTrue(cursor.getCount() > 0);
-		cursor.close();
+		testTable(db, BillingDB.TABLE_TRANSACTIONS);
 		testColumn(db, BillingDB.COLUMN__ID, "TEXT", true);
 		testColumn(db, BillingDB.COLUMN_PRODUCT_ID, "TEXT", true);
 		testColumn(db, BillingDB.COLUMN_STATE, "TEXT", true);
@@ -174,7 +178,6 @@ public class BillingDBTest extends AndroidTestCase {
 		BillingDB.DatabaseHelper helper = new BillingDB.DatabaseHelper(this.getContext());
 		SQLiteDatabase db = helper.getWritableDatabase();
 		helper.onUpgrade(db, BillingDB.DATABASE_VERSION, BillingDB.DATABASE_VERSION);
-
 	}
 	
 	private SQLiteDatabase createVersion1Database() {
