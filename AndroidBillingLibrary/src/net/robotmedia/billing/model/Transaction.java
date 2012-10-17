@@ -39,6 +39,7 @@ public class Transaction {
             return values[index];
         }
     }
+    
 	static final String DEVELOPER_PAYLOAD = "developerPayload";
 	static final String NOTIFICATION_ID = "notificationId";
 	static final String ORDER_ID = "orderId";
@@ -61,6 +62,8 @@ public class Transaction {
         return transaction;
     }
 
+    public String signedData;
+    public String signature;
 	public String developerPayload;
     public String notificationId;
     public String orderId;
@@ -72,7 +75,7 @@ public class Transaction {
     public Transaction() {}
     
     public Transaction(String orderId, String productId, String packageName, PurchaseState purchaseState,
-			String notificationId, long purchaseTime, String developerPayload) {
+			String notificationId, long purchaseTime, String developerPayload, String signature, String signedData) {
 		this.orderId = orderId;
 		this.productId = productId;
 		this.packageName = packageName;
@@ -80,10 +83,12 @@ public class Transaction {
 		this.notificationId = notificationId;
 		this.purchaseTime = purchaseTime;
 		this.developerPayload = developerPayload;
+		this.signature = signature;
+		this.signedData = signedData;
 	}
     
 	public Transaction clone() {
-		return new Transaction(orderId, productId, packageName, purchaseState, notificationId, purchaseTime, developerPayload);
+		return new Transaction(orderId, productId, packageName, purchaseState, notificationId, purchaseTime, developerPayload, signature, signedData);
 	}
 
 	@Override
@@ -124,6 +129,16 @@ public class Transaction {
 			return false;
 		if (purchaseTime != other.purchaseTime)
 			return false;
+		if (signature == null) {
+			if (other.signature != null)
+				return false;
+		} else if (!signature.equals(other.signature))
+			return false;
+		if (signedData == null) {
+			if (other.signedData != null)
+				return false;
+		} else if (!signedData.equals(other.signedData))
+			return false;
 		return true;
 	}
 	
@@ -131,5 +146,4 @@ public class Transaction {
 	public String toString() {
 		return String.valueOf(orderId);
 	}
-    
 }

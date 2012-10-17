@@ -308,7 +308,7 @@ public class BillingController {
 
 	/**
 	 * Obfuscates the specified purchase. Only the order id, product id and
-	 * developer payload are obfuscated.
+	 * developer payload, signed data and signature are obfuscated.
 	 * 
 	 * @param context
 	 * @param purchase
@@ -323,6 +323,8 @@ public class BillingController {
 		purchase.orderId = Security.obfuscate(context, salt, purchase.orderId);
 		purchase.productId = Security.obfuscate(context, salt, purchase.productId);
 		purchase.developerPayload = Security.obfuscate(context, salt, purchase.developerPayload);
+		purchase.signedData = Security.obfuscate(context, salt, purchase.signedData);
+		purchase.signature = Security.obfuscate(context, salt, purchase.signature);
 	}
 
 	/**
@@ -396,7 +398,7 @@ public class BillingController {
 		}
 
 		if (debug) {
-			onSignatureValidated(context, signedData);
+			onSignatureValidated(context, signedData, signature);
 			return;
 		}
 		
@@ -418,7 +420,7 @@ public class BillingController {
 			@Override
 			protected void onPostExecute(Boolean result) {
 				if (result) {
-					onSignatureValidated(context, signedData);
+					onSignatureValidated(context, signedData, signature);
 				} else {
 					Log.w(LOG_TAG, "Signature does not match data.");
 				}
@@ -436,8 +438,10 @@ public class BillingController {
 	 * @param context
 	 * @param signedData
 	 *            signed JSON data received from the Market Billing service.
+	 * @param signature
+	 *            data signature.
 	 */
-	private static void onSignatureValidated(Context context, String signedData) {
+	private static void onSignatureValidated(Context context, String signedData, String signature) {
 		List<Transaction> purchases;
 		try {
 			JSONObject jObject = new JSONObject(signedData);
@@ -460,6 +464,11 @@ public class BillingController {
 				// refunds.
 				addManualConfirmation(p.productId, p.notificationId);
 			}
+			
+			// Add signedData and signature as receipt to transaction
+			p.signedData = signedData;
+			p.signature = signature;
+			
 			storeTransaction(context, p);
 			notifyPurchaseStateChange(p.productId, p.purchaseState);
 		}
@@ -747,6 +756,8 @@ public class BillingController {
 		purchase.orderId = Security.unobfuscate(context, salt, purchase.orderId);
 		purchase.productId = Security.unobfuscate(context, salt, purchase.productId);
 		purchase.developerPayload = Security.unobfuscate(context, salt, purchase.developerPayload);
+		purchase.signedData = Security.unobfuscate(context, salt, purchase.signedData);
+		purchase.signature = Security.unobfuscate(context, salt, purchase.signature);
 	}
 
 	/**
