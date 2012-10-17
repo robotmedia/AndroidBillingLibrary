@@ -398,7 +398,7 @@ public class BillingController {
 		}
 
 		if (debug) {
-			onSignatureValidated(context, signedData);
+			onSignatureValidated(context, signedData, signature);
 			return;
 		}
 		
@@ -420,7 +420,7 @@ public class BillingController {
 			@Override
 			protected void onPostExecute(Boolean result) {
 				if (result) {
-					onSignatureValidated(context, signedData);
+					onSignatureValidated(context, signedData, signature);
 				} else {
 					Log.w(LOG_TAG, "Signature does not match data.");
 				}
@@ -438,8 +438,10 @@ public class BillingController {
 	 * @param context
 	 * @param signedData
 	 *            signed JSON data received from the Market Billing service.
+	 * @param signature
+	 *            data signature.
 	 */
-	private static void onSignatureValidated(Context context, String signedData) {
+	private static void onSignatureValidated(Context context, String signedData, String signature) {
 		List<Transaction> purchases;
 		try {
 			JSONObject jObject = new JSONObject(signedData);
