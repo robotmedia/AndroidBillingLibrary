@@ -92,7 +92,7 @@ public class BillingDB {
     	return purchase;
     }
 
-    private class DatabaseHelper extends SQLiteOpenHelper {
+    public static class DatabaseHelper extends SQLiteOpenHelper {
         public DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
@@ -105,10 +105,10 @@ public class BillingDB {
         private void createTransactionsTable(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_TRANSACTIONS + "(" +
             		COLUMN__ID + " TEXT PRIMARY KEY, " +
-            		COLUMN_PRODUCT_ID + " INTEGER, " +
+            		COLUMN_PRODUCT_ID + " TEXT, " +
             		COLUMN_STATE + " TEXT, " +
             		COLUMN_PURCHASE_TIME + " TEXT, " +
-            		COLUMN_DEVELOPER_PAYLOAD + " INTEGER, " +
+            		COLUMN_DEVELOPER_PAYLOAD + " TEXT, " +
             		COLUMN_SIGNED_DATA + " TEXT," +
             		COLUMN_SIGNATURE + " TEXT)");
         }
