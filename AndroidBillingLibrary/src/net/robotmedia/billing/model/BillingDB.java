@@ -42,7 +42,7 @@ public class BillingDB {
     private DatabaseHelper mDatabaseHelper;
 
     public BillingDB(Context context) {
-        mDatabaseHelper = new DatabaseHelper(context);
+        mDatabaseHelper = DatabaseHelper.getInstance(context);
         mDb = mDatabaseHelper.getWritableDatabase();
     }
 
@@ -85,10 +85,21 @@ public class BillingDB {
     	return purchase;
     }
 
-    private class DatabaseHelper extends SQLiteOpenHelper {
-        public DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
+	private static class DatabaseHelper extends SQLiteOpenHelper {
+		private static DatabaseHelper mInstance;
+
+		public static synchronized DatabaseHelper getInstance(Context context) {
+			if (mInstance == null)
+				mInstance = new DatabaseHelper(context.getApplicationContext());
+
+			return mInstance;
+		}
+
+		private DatabaseHelper(Context context) {
+			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+			mInstance = this;
+		}
 
         @Override
         public void onCreate(SQLiteDatabase db) {
