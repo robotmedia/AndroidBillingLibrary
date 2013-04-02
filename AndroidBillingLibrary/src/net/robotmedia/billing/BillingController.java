@@ -547,7 +547,7 @@ public class BillingController {
 	 * @param context
 	 * @param itemId
 	 *            id of the item to be purchased.
-	 * @see #requestPurchase(Context, String, boolean)
+	 * @see #requestPurchase(Context, String, boolean, String)
 	 */
 	public static void requestPurchase(Context context, String itemId) {
 		requestPurchase(context, itemId, false, null);
