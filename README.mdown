@@ -1,8 +1,9 @@
 Update
 ======
 
-The In-app Billing API has been recently updated to [version 3](https://developer.android.com/google/play/billing/api.html). This library is currently for version 2 only, and will be updated in early 2013.
+The In-app Billing API was updated to [version 3](https://developer.android.com/google/play/billing/api.html) in early 2013. This library is currently for version 2 and version 1 only.
 
+If you're interested in helping to update it to version 3, please fork and send a pull request.
 
 Android Billing Library
 =======================
