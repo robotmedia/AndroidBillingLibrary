@@ -6,6 +6,10 @@ In-app Billing v2 API is deprecated and will be shut down in January 2015. This 
 The project [Android Checkout Library](https://github.com/serso/android-checkout) by @serso supports v3 and attemps to provide [data compatibility](https://github.com/serso/android-checkout#billing-version-2) with AndroidBillingLibrary. We haven't verified this so please use it at your own discretion.
 
 
+If you want to move to version 3 but don't want to implement it yourself you can try [Android Checkout Library](https://github.com/serso/android-checkout).
+This library supports only Billing API version 3 but has a fallback functionality - if device doesn't support Billing v3 **Checkout** will try to load purchases information from Robotmedia database (read [this](https://github.com/serso/android-checkout#billing-version-2) for more information).
+Note that **Checkout** library is a 3rd party library and is not maintained by Robotmedia.
+
 Android Billing Library
 =======================
 
