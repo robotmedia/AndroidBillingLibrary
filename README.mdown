@@ -1,9 +1,10 @@
 Update
 ======
 
-The In-app Billing API was updated to [version 3](https://developer.android.com/google/play/billing/api.html) in early 2013. This library is currently for version 2 and version 1 only.
+In-app Billing v2 API is deprecated and will be shut down in January 2015. This library was developed for v2 a long time ago. If your app is still using this library, please migrate to the [v3 API](https://developer.android.com/google/play/billing/api.html) as soon as possible.
 
-If you're interested in helping to update it to version 3, please fork and send a pull request.
+The project [Android Checkout Library](https://github.com/serso/android-checkout) by @serso supports v3 and attemps to provide [data compatibility](https://github.com/serso/android-checkout#billing-version-2) with AndroidBillingLibrary. We haven't verified this so please use it at your own discretion.
+
 
 Android Billing Library
 =======================
