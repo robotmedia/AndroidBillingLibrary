@@ -16,7 +16,7 @@ public class MockBillingObserver implements IBillingObserver {
 	public void onPurchaseIntent(String itemId, PendingIntent purchaseIntent) {
 	}
 
-	public void onPurchaseStateChanged(String itemId, PurchaseState state) {
+	public void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId) {
 	}
 
 	public void onRequestPurchaseResponse(String itemId, ResponseCode response) {

@@ -73,8 +73,8 @@ public class Dungeons extends Activity {
 				Dungeons.this.onBillingChecked(supported);
 			}
 
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
-				Dungeons.this.onPurchaseStateChanged(itemId, state);
+			public void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId) {
+				Dungeons.this.onPurchaseStateChanged(itemId, state, orderId);
 			}
 
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
@@ -112,7 +112,7 @@ public class Dungeons extends Activity {
 		super.onDestroy();
 	}
 
-	public void onPurchaseStateChanged(String itemId, PurchaseState state) {
+	public void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId) {
 		Log.i(TAG, "onPurchaseStateChanged() itemId: " + itemId);
 		updateOwnedItems();
 	}
@@ -144,9 +144,9 @@ public class Dungeons extends Activity {
 
 			public void onClick(View v) {
 				if (mSelectedItem.managed != Managed.SUBSCRIPTION) {
-					BillingController.requestPurchase(Dungeons.this, mSelectedItem.sku, true /* confirm */, null);
+					BillingController.requestPurchase(Dungeons.this, mSelectedItem.sku);
 				} else {
-					BillingController.requestSubscription(Dungeons.this, mSelectedItem.sku, true /* confirm */, null);
+					BillingController.requestSubscription(Dungeons.this, mSelectedItem.sku);
 				}
 			}
 		});

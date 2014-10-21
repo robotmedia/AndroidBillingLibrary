@@ -37,6 +37,7 @@ import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -60,9 +61,12 @@ public class BillingController {
 
 		/**
 		 * Returns the public key used to verify the signature of responses of
-		 * the Market Billing service.
+		 * the Google Play Billing service. If you are using a custom signature
+		 * validator with server-side validation this method might not be needed
+		 * and can return null.
 		 * 
 		 * @return Base64 encoded public key.
+		 * @see BillingController#setSignatureValidator(ISignatureValidator)
 		 */
 		public String getPublicKey();
 	}
@@ -296,15 +300,15 @@ public class BillingController {
 	 * @param state
 	 *            new purchase state of the item.
 	 */
-	private static void notifyPurchaseStateChange(String itemId, Transaction.PurchaseState state) {
+	private static void notifyPurchaseStateChange(String itemId, Transaction.PurchaseState state, String orderId) {
 		for (IBillingObserver o : observers) {
-			o.onPurchaseStateChanged(itemId, state);
+			o.onPurchaseStateChanged(itemId, state, orderId);
 		}
 	}
 
 	/**
 	 * Obfuscates the specified purchase. Only the order id, product id and
-	 * developer payload are obfuscated.
+	 * developer payload, signed data and signature are obfuscated.
 	 * 
 	 * @param context
 	 * @param purchase
@@ -319,6 +323,8 @@ public class BillingController {
 		purchase.orderId = Security.obfuscate(context, salt, purchase.orderId);
 		purchase.productId = Security.obfuscate(context, salt, purchase.productId);
 		purchase.developerPayload = Security.obfuscate(context, salt, purchase.developerPayload);
+		purchase.signedData = Security.obfuscate(context, salt, purchase.signedData);
+		purchase.signature = Security.obfuscate(context, salt, purchase.signature);
 	}
 
 	/**
@@ -372,8 +378,8 @@ public class BillingController {
 	/**
 	 * Called after the response to a
 	 * {@link net.robotmedia.billing.request.GetPurchaseInformation} request is
-	 * received. Registers all transactions in local memory and confirms those
-	 * who can be confirmed automatically.
+	 * received. Validates the signature asynchronously and calls
+	 * {@link #onSignatureValidated(Context, String)} if successful.
 	 * 
 	 * @param context
 	 * @param signedData
@@ -381,7 +387,7 @@ public class BillingController {
 	 * @param signature
 	 *            data signature.
 	 */
-	protected static void onPurchaseStateChanged(Context context, String signedData, String signature) {
+	protected static void onPurchaseStateChanged(final Context context, final String signedData, final String signature) {
 		debug("Purchase state changed");
 		
 		if (TextUtils.isEmpty(signedData)) {
@@ -391,19 +397,51 @@ public class BillingController {
 			debug(signedData);
 		}
 
-		if (!debug) {
-			if (TextUtils.isEmpty(signature)) {
-				Log.w(LOG_TAG, "Empty signature requires debug mode");
-				return;
-			}
-			final ISignatureValidator validator = BillingController.validator != null ? BillingController.validator
-					: new DefaultSignatureValidator(BillingController.configuration);
-			if (!validator.validate(signedData, signature)) {
-				Log.w(LOG_TAG, "Signature does not match data.");
-				return;
-			}
+		if (debug) {
+			onSignatureValidated(context, signedData, signature);
+			return;
 		}
+		
+		if (TextUtils.isEmpty(signature)) {
+			Log.w(LOG_TAG, "Empty signature requires debug mode");
+			return;
+		}
+		final ISignatureValidator validator = BillingController.validator != null ? BillingController.validator
+				: new DefaultSignatureValidator(BillingController.configuration);
 
+		// Use AsyncTask mostly in case the signature is validated remotely
+		new AsyncTask<Void, Void, Boolean>() {
+
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				return validator.validate(signedData, signature);
+			}
+
+			@Override
+			protected void onPostExecute(Boolean result) {
+				if (result) {
+					onSignatureValidated(context, signedData, signature);
+				} else {
+					Log.w(LOG_TAG, "Validation failed");
+				}
+			}
+
+		}.execute();
+	}
+	
+	/**
+	 * Called after the signature of a response to a
+	 * {@link net.robotmedia.billing.request.GetPurchaseInformation} request has
+	 * been validated. Registers all transactions in local memory and confirms
+	 * those who can be confirmed automatically.
+	 * 
+	 * @param context
+	 * @param signedData
+	 *            signed JSON data received from the Market Billing service.
+	 * @param signature
+	 *            data signature.
+	 */
+	private static void onSignatureValidated(Context context, String signedData, String signature) {
 		List<Transaction> purchases;
 		try {
 			JSONObject jObject = new JSONObject(signedData);
@@ -426,13 +464,18 @@ public class BillingController {
 				// refunds.
 				addManualConfirmation(p.productId, p.notificationId);
 			}
+			
+			// Add signedData and signature as receipt to transaction
+			p.signedData = signedData;
+			p.signature = signature;
+			
 			storeTransaction(context, p);
-			notifyPurchaseStateChange(p.productId, p.purchaseState);
+			notifyPurchaseStateChange(p.productId, p.purchaseState, p.orderId);
 		}
 		if (!confirmations.isEmpty()) {
 			final String[] notifyIds = confirmations.toArray(new String[confirmations.size()]);
 			confirmNotifications(context, notifyIds);
-		}
+		}		
 	}
 
 	/**
@@ -537,11 +580,10 @@ public class BillingController {
 	}
 
 	/**
-	 * Requests the purchase of the specified item. The transaction will not be
-	 * confirmed automatically.
+	 * Requests the purchase of the specified item. The transaction will be
+	 * confirmed automatically. If manual confirmation or a developer payload are required use {@link #requestPurchase(Context, String, boolean, String)} instead.
 	 * <p>
-	 * For subscriptions, use {@link #requestSubscription(Context, String)}
-	 * instead.
+	 * For subscriptions, use {@link #requestSubscription(Context, String)}.
 	 * </p>
 	 * 
 	 * @param context
@@ -550,7 +592,7 @@ public class BillingController {
 	 * @see #requestPurchase(Context, String, boolean, String)
 	 */
 	public static void requestPurchase(Context context, String itemId) {
-		requestPurchase(context, itemId, false, null);
+		requestPurchase(context, itemId, true /* confirm */, null);
 	}
 
 	/**
@@ -583,8 +625,8 @@ public class BillingController {
 	}
 
 	/**
-	 * Requests the purchase of the specified subscription item. The transaction
-	 * will not be confirmed automatically.
+	 * Requests the purchase of the specified subscription item. The transaction will be
+	 * confirmed automatically. If manual confirmation or a developer payload are required use {@link #requestSubscription(Context, String, boolean, String)} instead.
 	 * 
 	 * @param context
 	 * @param itemId
@@ -592,7 +634,7 @@ public class BillingController {
 	 * @see #requestSubscription(Context, String, boolean, String)
 	 */
 	public static void requestSubscription(Context context, String itemId) {
-		requestSubscription(context, itemId, false, null);
+		requestSubscription(context, itemId, true /* confirm */, null);
 	}
 
 	/**
@@ -713,6 +755,8 @@ public class BillingController {
 		purchase.orderId = Security.unobfuscate(context, salt, purchase.orderId);
 		purchase.productId = Security.unobfuscate(context, salt, purchase.productId);
 		purchase.developerPayload = Security.unobfuscate(context, salt, purchase.developerPayload);
+		purchase.signedData = Security.unobfuscate(context, salt, purchase.signedData);
+		purchase.signature = Security.unobfuscate(context, salt, purchase.signature);
 	}
 
 	/**

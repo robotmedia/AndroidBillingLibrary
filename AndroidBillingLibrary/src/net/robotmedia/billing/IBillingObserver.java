@@ -61,8 +61,12 @@ public interface IBillingObserver {
 	 *            id of the item whose purchase state has changed.
 	 * @param state
 	 *            purchase state of the specified item.
+	 * @param orderId
+	 *            id of the corresponding order. This is particularly useful to
+	 *            differentiate between different orders of the same unmanaged
+	 *            item.
 	 */
-	public void onPurchaseStateChanged(String itemId, PurchaseState state);
+	public void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId);
 
 	/**
 	 * Called with the response for the purchase request of the specified item.

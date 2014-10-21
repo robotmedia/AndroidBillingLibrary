@@ -89,8 +89,8 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 				AbstractBillingActivity.this.onSubscriptionChecked(supported);
 			}
 
-			public void onPurchaseStateChanged(String itemId, PurchaseState state) {
-				AbstractBillingActivity.this.onPurchaseStateChanged(itemId, state);
+			public void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId) {
+				AbstractBillingActivity.this.onPurchaseStateChanged(itemId, state, orderId);
 			}
 
 			public void onRequestPurchaseResponse(String itemId, ResponseCode response) {
@@ -116,16 +116,14 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 		BillingController.setConfiguration(null);
 	}
 
-	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state);;
+	public abstract void onPurchaseStateChanged(String itemId, PurchaseState state, String orderId);
 
 	public abstract void onRequestPurchaseResponse(String itemId, ResponseCode response);
 
 	/**
-	 * Requests the purchase of the specified item. The transaction will not be
-	 * confirmed automatically; such confirmation could be handled in
-	 * {@link AbstractBillingActivity#onPurchaseExecuted(String)}. If automatic
-	 * confirmation is preferred use
-	 * {@link BillingController#requestPurchase(android.content.Context, String, boolean)}
+	 * Requests the purchase of the specified item. The transaction will be
+	 * confirmed automatically. If manual confirmation is required use
+	 * {@link BillingController#requestPurchase(android.content.Context, String, boolean, String)}
 	 * instead.
 	 * 
 	 * @param itemId
@@ -137,10 +135,8 @@ public abstract class AbstractBillingActivity extends Activity implements Billin
 
 	/**
 	 * Requests the purchase of the specified subscription item. The transaction
-	 * will not be confirmed automatically; such confirmation could be handled
-	 * in {@link AbstractBillingActivity#onPurchaseExecuted(String)}. If
-	 * automatic confirmation is preferred use
-	 * {@link BillingController#requestPurchase(android.content.Context, String, boolean)}
+	 * will be confirmed automatically. If manual confirmation is required use
+	 * {@link BillingController#requestSubscription(android.content.Context, String, boolean, String)}
 	 * instead.
 	 * 
 	 * @param itemId
