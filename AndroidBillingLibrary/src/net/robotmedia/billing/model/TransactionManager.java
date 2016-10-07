@@ -30,6 +30,12 @@ public class TransactionManager {
 		db.close();
 	}
 	
+	public synchronized static void removeTransaction(Context context, Transaction transaction) {
+		BillingDB db = new BillingDB(context);
+		db.remove(transaction);
+		db.close();
+	}
+	
 	public synchronized static boolean isPurchased(Context context, String itemId) {
 		return countPurchases(context, itemId) > 0;
 	}

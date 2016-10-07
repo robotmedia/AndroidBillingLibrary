@@ -60,6 +60,10 @@ public class BillingDB {
         mDb.replace(TABLE_TRANSACTIONS, null /* nullColumnHack */, values);
     }
     
+    public void remove(Transaction transaction) {
+		mDb.delete(TABLE_TRANSACTIONS, COLUMN__ID + "=?", new String[] { transaction.orderId });
+	}
+    
     public Cursor queryTransactions() {
         return mDb.query(TABLE_TRANSACTIONS, TABLE_TRANSACTIONS_COLUMNS, null,
                 null, null, null, null);
