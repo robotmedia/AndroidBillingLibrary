@@ -21,16 +21,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import net.robotmedia.billing.model.Transaction;
 import net.robotmedia.billing.model.TransactionManager;
 import net.robotmedia.billing.security.DefaultSignatureValidator;
 import net.robotmedia.billing.security.ISignatureValidator;
 import net.robotmedia.billing.utils.Compatibility;
 import net.robotmedia.billing.utils.Security;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -685,13 +685,19 @@ public class BillingController {
 		}
 	}
 
-	static void storeTransaction(Context context, Transaction t) {
+	public static void storeTransaction(Context context, Transaction t) {
 		final Transaction t2 = t.clone();
 		obfuscate(context, t2);
 		TransactionManager.addTransaction(context, t2);
 	}
 
-	static void unobfuscate(Context context, List<Transaction> transactions) {
+	public static void removeTransaction(Context context, Transaction t) {
+		final Transaction t2 = t.clone();
+		obfuscate(context, t2);
+		TransactionManager.removeTransaction(context, t2);
+	}
+
+	public static void unobfuscate(Context context, List<Transaction> transactions) {
 		for (Transaction p : transactions) {
 			unobfuscate(context, p);
 		}
