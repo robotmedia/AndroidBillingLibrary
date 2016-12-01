@@ -24,7 +24,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class BillingDB {
     static final String DATABASE_NAME = "billing.db";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
     static final String TABLE_TRANSACTIONS = "purchases";
 
     public static final String COLUMN__ID = "_id";
@@ -32,10 +32,13 @@ public class BillingDB {
     public static final String COLUMN_PRODUCT_ID = "productId";
     public static final String COLUMN_PURCHASE_TIME = "purchaseTime";
     public static final String COLUMN_DEVELOPER_PAYLOAD = "developerPayload";
+    public static final String COLUMN_SIGNED_DATA = "signedData";
+    public static final String COLUMN_SIGNATURE = "signature";
 
     private static final String[] TABLE_TRANSACTIONS_COLUMNS = {
     	COLUMN__ID, COLUMN_PRODUCT_ID, COLUMN_STATE,
-    	COLUMN_PURCHASE_TIME, COLUMN_DEVELOPER_PAYLOAD
+    	COLUMN_PURCHASE_TIME, COLUMN_DEVELOPER_PAYLOAD,
+    	COLUMN_SIGNED_DATA, COLUMN_SIGNATURE
     };
 
     SQLiteDatabase mDb;
@@ -57,6 +60,8 @@ public class BillingDB {
         values.put(COLUMN_STATE, transaction.purchaseState.ordinal());
         values.put(COLUMN_PURCHASE_TIME, transaction.purchaseTime);
         values.put(COLUMN_DEVELOPER_PAYLOAD, transaction.developerPayload);
+        values.put(COLUMN_SIGNED_DATA, transaction.signedData);
+        values.put(COLUMN_SIGNATURE, transaction.signature);
         mDb.replace(TABLE_TRANSACTIONS, null /* nullColumnHack */, values);
     }
     
@@ -82,6 +87,8 @@ public class BillingDB {
     	purchase.purchaseState = PurchaseState.valueOf(cursor.getInt(2));
     	purchase.purchaseTime = cursor.getLong(3);
     	purchase.developerPayload = cursor.getString(4);
+    	purchase.signedData = cursor.getString(5);
+    	purchase.signature = cursor.getString(6);
     	return purchase;
     }
 
@@ -101,10 +108,25 @@ public class BillingDB {
             		COLUMN_PRODUCT_ID + " INTEGER, " +
             		COLUMN_STATE + " TEXT, " +
             		COLUMN_PURCHASE_TIME + " TEXT, " +
-            		COLUMN_DEVELOPER_PAYLOAD + " INTEGER)");
+            		COLUMN_DEVELOPER_PAYLOAD + " INTEGER, " +
+            		COLUMN_SIGNED_DATA + " TEXT," +
+            		COLUMN_SIGNATURE + " TEXT)");
         }
 
 		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			if (oldVersion == 1 && newVersion == 2) {
+				db.beginTransaction();
+				try {
+					db.execSQL("ALTER TABLE " + TABLE_TRANSACTIONS + 
+							" ADD COLUMN " + COLUMN_SIGNED_DATA + " TEXT");
+					db.execSQL("ALTER TABLE " + TABLE_TRANSACTIONS + 
+							" ADD COLUMN " + COLUMN_SIGNATURE + " TEXT");
+					db.setTransactionSuccessful();
+				} finally {
+					db.endTransaction();
+				}
+			}
+		}
     }
 }
